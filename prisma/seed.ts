@@ -24,18 +24,32 @@ async function main() {
   console.log(`✅ Admin user: ${admin.email}`);
 
   // Create sample manager
-  const managerPassword = await bcrypt.hash("pass.manager", 10);
+  const managerPassword = await bcrypt.hash("pass.manager1", 10);
   const manager = await prisma.user.upsert({
-    where: { email: "manager@hitchhikers.com" },
+    where: { email: "manager1@falab.kr" },
     update: {},
     create: {
-      email: "manager@hitchhikers.com",
-      name: "EditorPark",
+      email: "manager1@falab.kr",
+      name: "Manager1",
       password: managerPassword,
       role: "manager",
     },
   });
   console.log(`✅ Manager user: ${manager.email}`);
+
+  // Create sample user
+  const userPassword = await bcrypt.hash("pass.user1", 10);
+  const user1 = await prisma.user.upsert({
+    where: { email: "user1@falab.kr" },
+    update: {},
+    create: {
+      email: "user1@falab.kr",
+      name: "User1",
+      password: userPassword,
+      role: "user",
+    },
+  });
+  console.log(`✅ User: ${user1.email}`);
 
   // Create sample apps
   const apps = [
@@ -152,7 +166,8 @@ async function main() {
 
   console.log("\n🎉 Seed completed!");
   console.log("  Admin login: admin@falab.kr / pass.admin");
-  console.log("  Manager login: manager@hitchhikers.com / pass.manager");
+  console.log("  Manager login: manager1@falab.kr / pass.manager1");
+  console.log("  User login: user1@falab.kr / pass.user1");
 }
 
 main()

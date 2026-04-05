@@ -45,12 +45,17 @@
 - [x] 사용자 관리에서 키워드로 검색 가능하게
 - [x] 아티클 관리 기능 세부 구현
 
-### Phase 7: 고도화 및 배포
+### Phase 7: seed 계정
+
+- [ ] admin@falab.kr pass.admin 최고 관리자 계정
+- [ ] user1@falab.kr pass.user1 사용자1 계정
+- [ ] manager1@falab.kr pass.manager1 매니저1 계정
+
+
+### 나중에 할일들: 이 항목을 구현하지 마세요
+
+- [ ] falab.kr 도메인 등록 
 - [ ] Gemini API 실제 연동 (프록시 API Route)
 - [ ] Gemini를 활용한 패션 추천 기능 정교화
 - [ ] Vercel 또는 AWS를 통한 배포
 - [ ] 최종 디자인 검수 (패션 매거진 느낌의 UI 디테일 조정)
-
-### 나중에 할일들:
-
-- [ ] falab.kr 도메인 등록 

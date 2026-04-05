@@ -50,7 +50,7 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold mb-4">문의</h3>
             <ul className="space-y-2 text-sm text-muted">
-              <li>admin@hitchhikers.com</li>
+              <li>help@falab.kr</li>
               <li>
                 <Link href="/community?type=forum" className="hover:text-foreground transition-colors">
                   포럼에서 질문하기

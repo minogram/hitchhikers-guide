@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { MessageSquare, Briefcase, BookOpen, Bell, Clock, MessageCircle, Plus } from "lucide-react";
+import { MessageSquare, Briefcase, BookOpen, Bell, Clock, MessageCircle, Plus, Search } from "lucide-react";
 import type { BoardType } from "@/lib/types";
 
 interface PostItem {
@@ -43,6 +43,7 @@ export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<BoardType | "all">("all");
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -54,10 +55,18 @@ export default function CommunityPage() {
       });
   }, []);
 
-  const filteredPosts =
-    activeTab === "all"
-      ? posts
-      : posts.filter((p) => p.type === activeTab);
+  const filteredPosts = posts.filter((p) => {
+    if (activeTab !== "all" && p.type !== activeTab) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return (
+        p.title.toLowerCase().includes(q) ||
+        p.content.toLowerCase().includes(q) ||
+        p.authorName.toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
@@ -72,6 +81,25 @@ export default function CommunityPage() {
         <p className="mt-4 text-muted">
           패션 AI 전문가들과 소통하고 인사이트를 나눠보세요.
         </p>
+      </div>
+
+      {/* Search */}
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="제목, 내용, 작성자로 검색..."
+            className="w-full rounded-xl border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
+          />
+        </div>
+        {searchQuery && (
+          <p className="mt-2 text-xs text-muted">
+            검색 결과: {filteredPosts.length}건
+          </p>
+        )}
       </div>
 
       {/* Actions */}
