@@ -1,0 +1,143 @@
+"use server";
+
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+
+const PostSchema = z.object({
+  type: z.enum(["notice", "forum", "job", "article"]),
+  title: z.string().min(1, "제목을 입력해주세요.").max(200),
+  content: z.string().min(1, "내용을 입력해주세요."),
+  isPinned: z.boolean().optional(),
+});
+
+export type PostFormState = {
+  errors?: {
+    type?: string[];
+    title?: string[];
+    content?: string[];
+  };
+  message?: string;
+};
+
+export async function createPost(
+  _prevState: PostFormState | undefined,
+  formData: FormData
+): Promise<PostFormState> {
+  const session = await auth();
+  if (!session?.user) {
+    return { message: "로그인이 필요합니다." };
+  }
+
+  const role = session.user.role as string;
+  const type = formData.get("type") as string;
+
+  // Role-based type restrictions
+  if (type === "notice" && role !== "admin" && role !== "manager") {
+    return { message: "공지사항은 관리자 또는 매니저만 작성할 수 있습니다." };
+  }
+  if (type === "article" && role !== "admin" && role !== "manager") {
+    return { message: "아티클은 관리자 또는 매니저만 작성할 수 있습니다." };
+  }
+
+  const validated = PostSchema.safeParse({
+    type,
+    title: formData.get("title"),
+    content: formData.get("content"),
+    isPinned: formData.get("isPinned") === "on",
+  });
+
+  if (!validated.success) {
+    return { errors: validated.error.flatten().fieldErrors };
+  }
+
+  const canPin = role === "admin" || role === "manager";
+
+  await prisma.post.create({
+    data: {
+      type: validated.data.type,
+      title: validated.data.title,
+      content: validated.data.content,
+      isPinned: canPin ? (validated.data.isPinned ?? false) : false,
+      authorId: session.user.id!,
+    },
+  });
+
+  revalidatePath("/community");
+  redirect("/community");
+}
+
+export async function updatePost(
+  postId: string,
+  _prevState: PostFormState | undefined,
+  formData: FormData
+): Promise<PostFormState> {
+  const session = await auth();
+  if (!session?.user) {
+    return { message: "로그인이 필요합니다." };
+  }
+
+  const post = await prisma.post.findUnique({ where: { id: postId } });
+  if (!post) {
+    return { message: "게시글을 찾을 수 없습니다." };
+  }
+
+  const role = session.user.role as string;
+  const isOwner = post.authorId === session.user.id;
+  const isPrivileged = role === "admin" || role === "manager";
+
+  if (!isOwner && !isPrivileged) {
+    return { message: "수정 권한이 없습니다." };
+  }
+
+  const validated = PostSchema.safeParse({
+    type: formData.get("type"),
+    title: formData.get("title"),
+    content: formData.get("content"),
+    isPinned: formData.get("isPinned") === "on",
+  });
+
+  if (!validated.success) {
+    return { errors: validated.error.flatten().fieldErrors };
+  }
+
+  await prisma.post.update({
+    where: { id: postId },
+    data: {
+      title: validated.data.title,
+      content: validated.data.content,
+      isPinned: isPrivileged ? (validated.data.isPinned ?? false) : post.isPinned,
+    },
+  });
+
+  revalidatePath("/community");
+  revalidatePath(`/community/${postId}`);
+  redirect(`/community/${postId}`);
+}
+
+export async function deletePost(postId: string): Promise<{ message?: string }> {
+  const session = await auth();
+  if (!session?.user) {
+    return { message: "로그인이 필요합니다." };
+  }
+
+  const post = await prisma.post.findUnique({ where: { id: postId } });
+  if (!post) {
+    return { message: "게시글을 찾을 수 없습니다." };
+  }
+
+  const role = session.user.role as string;
+  const isOwner = post.authorId === session.user.id;
+  const isPrivileged = role === "admin" || role === "manager";
+
+  if (!isOwner && !isPrivileged) {
+    return { message: "삭제 권한이 없습니다." };
+  }
+
+  await prisma.post.delete({ where: { id: postId } });
+
+  revalidatePath("/community");
+  redirect("/community");
+}

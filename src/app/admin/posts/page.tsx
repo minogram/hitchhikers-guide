@@ -1,12 +1,12 @@
 import { requireRole } from "@/lib/auth-guard";
-import { getUsers } from "@/app/actions/admin";
+import { getAdminPosts } from "@/app/actions/admin-posts";
 import Link from "next/link";
-import { ArrowLeft, Users } from "lucide-react";
-import { AdminUserList } from "./AdminUserList";
+import { ArrowLeft, FileText } from "lucide-react";
+import { AdminPostList } from "./AdminPostList";
 
-export default async function AdminUsersPage() {
-  await requireRole("admin");
-  const users = await getUsers();
+export default async function AdminPostsPage() {
+  await requireRole("admin", "manager");
+  const posts = await getAdminPosts();
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12 lg:px-8">
@@ -20,17 +20,17 @@ export default async function AdminUsersPage() {
 
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Users className="h-6 w-6 text-accent" />
+          <FileText className="h-6 w-6 text-accent" />
           <h1 className="font-serif text-3xl font-bold tracking-tight">
-            사용자 관리
+            콘텐츠 관리
           </h1>
         </div>
         <p className="text-muted">
-          회원 등급을 조정하고 매니저를 임명합니다. 총 {users.length}명
+          게시글을 관리하고 고정/삭제합니다. 총 {posts.length}건
         </p>
       </div>
 
-      <AdminUserList users={users} />
+      <AdminPostList posts={posts} />
     </div>
   );
 }

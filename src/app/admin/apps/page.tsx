@@ -1,8 +1,8 @@
 import { requireRole } from "@/lib/auth-guard";
 import { getApps } from "@/app/actions/apps";
 import Link from "next/link";
-import { ArrowLeft, AppWindow, Plus, Sparkles } from "lucide-react";
-import { DeleteAppButton } from "./DeleteAppButton";
+import { ArrowLeft, AppWindow, Plus } from "lucide-react";
+import { AdminAppList } from "./AdminAppList";
 
 export default async function AdminAppsPage() {
   await requireRole("admin", "manager");
@@ -37,72 +37,7 @@ export default async function AdminAppsPage() {
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-card-hover">
-              <th className="text-left px-6 py-3 font-medium text-muted">앱 이름</th>
-              <th className="text-left px-6 py-3 font-medium text-muted">태그</th>
-              <th className="text-left px-6 py-3 font-medium text-muted">등록자</th>
-              <th className="text-left px-6 py-3 font-medium text-muted">등록일</th>
-              <th className="text-left px-6 py-3 font-medium text-muted">작업</th>
-            </tr>
-          </thead>
-          <tbody>
-            {apps.map((app) => {
-              const industryTags: string[] = JSON.parse(app.industryTags);
-              const processTags: string[] = JSON.parse(app.processTags);
-              return (
-                <tr key={app.id} className="border-b border-border last:border-0">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{app.title}</span>
-                      {app.hasGeminiDemo && (
-                        <Sparkles className="h-3.5 w-3.5 text-accent" />
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
-                      {industryTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                      {processTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="inline-block rounded-full bg-foreground/5 px-2 py-0.5 text-xs text-muted"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-muted">{app.author.name}</td>
-                  <td className="px-6 py-4 text-muted">
-                    {new Date(app.createdAt).toLocaleDateString("ko-KR")}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={`/admin/apps/${app.id}/edit`}
-                        className="text-xs text-accent hover:underline"
-                      >
-                        수정
-                      </Link>
-                      <DeleteAppButton appId={app.id} appTitle={app.title} />
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <AdminAppList apps={apps} />
     </div>
   );
 }

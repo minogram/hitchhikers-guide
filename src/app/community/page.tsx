@@ -1,10 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { MessageSquare, Briefcase, BookOpen, Bell, Clock, MessageCircle } from "lucide-react";
-import { samplePosts } from "@/lib/data";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { MessageSquare, Briefcase, BookOpen, Bell, Clock, MessageCircle, Plus } from "lucide-react";
 import type { BoardType } from "@/lib/types";
+
+interface PostItem {
+  id: string;
+  type: BoardType;
+  title: string;
+  content: string;
+  authorName: string;
+  isPinned: boolean;
+  createdAt: string;
+  commentCount: number;
+}
 
 const tabs: { type: BoardType | "all"; label: string; icon: React.ReactNode }[] = [
   { type: "all", label: "전체", icon: null },
@@ -30,11 +41,23 @@ const typeColor: Record<BoardType, string> = {
 
 export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<BoardType | "all">("all");
+  const [posts, setPosts] = useState<PostItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    fetch("/api/posts")
+      .then((res) => res.json())
+      .then((data) => {
+        setPosts(data);
+        setLoading(false);
+      });
+  }, []);
 
   const filteredPosts =
     activeTab === "all"
-      ? samplePosts
-      : samplePosts.filter((p) => p.type === activeTab);
+      ? posts
+      : posts.filter((p) => p.type === activeTab);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
@@ -51,22 +74,35 @@ export default function CommunityPage() {
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-        {tabs.map((tab) => (
-          <button
-            key={tab.type}
-            onClick={() => setActiveTab(tab.type)}
-            className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === tab.type
-                ? "bg-foreground text-background"
-                : "bg-card border border-border text-muted hover:text-foreground"
-            }`}
+      {/* Actions */}
+      <div className="flex items-center justify-between mb-8">
+        {/* Tabs */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.type}
+              onClick={() => setActiveTab(tab.type)}
+              className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === tab.type
+                  ? "bg-foreground text-background"
+                  : "bg-card border border-border text-muted hover:text-foreground"
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {session?.user && (
+          <Link
+            href="/community/new"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 transition-opacity"
           >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
+            <Plus className="h-4 w-4" />
+            글쓰기
+          </Link>
+        )}
       </div>
 
       {/* Post List */}
@@ -101,7 +137,7 @@ export default function CommunityPage() {
                   <span>{post.authorName}</span>
                   <span className="inline-flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    {post.createdAt.toLocaleDateString("ko-KR")}
+                    {new Date(post.createdAt).toLocaleDateString("ko-KR")}
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <MessageCircle className="h-3 w-3" />
@@ -114,11 +150,15 @@ export default function CommunityPage() {
         ))}
       </div>
 
-      {filteredPosts.length === 0 && (
+      {loading ? (
+        <div className="text-center py-20">
+          <p className="text-muted">로딩 중...</p>
+        </div>
+      ) : filteredPosts.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-muted">게시글이 없습니다.</p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

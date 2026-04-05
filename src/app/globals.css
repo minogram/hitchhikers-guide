@@ -24,17 +24,15 @@
   --font-serif: var(--font-playfair);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --accent: #fb7185;
-    --accent-light: #1c1017;
-    --muted: #a3a3a3;
-    --border: #262626;
-    --card: #171717;
-    --card-hover: #1f1f1f;
-  }
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --accent: #fb7185;
+  --accent-light: #1c1017;
+  --muted: #a3a3a3;
+  --border: #262626;
+  --card: #171717;
+  --card-hover: #1f1f1f;
 }
 
 body {

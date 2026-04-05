@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, X, Sparkles, LogOut, Shield } from "lucide-react";
+import { Menu, X, Sparkles, LogOut, Shield, UserCircle, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 
 const navigation = [
   { name: "카탈로그", href: "/catalog" },
@@ -15,8 +16,13 @@ const navigation = [
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
+  const { resolvedTheme, setTheme } = useTheme();
   const isAdmin = session?.user?.role === "admin";
   const isManager = session?.user?.role === "manager";
+
+  function toggleTheme() {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
@@ -53,14 +59,29 @@ export function Header() {
 
         {/* Auth Buttons */}
         <div className="hidden md:flex md:items-center md:gap-4">
+          <button
+            onClick={toggleTheme}
+            className="rounded-full p-2 text-muted hover:text-foreground hover:bg-card transition-colors"
+            title={resolvedTheme === "dark" ? "라이트 모드" : "다크 모드"}
+          >
+            {resolvedTheme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </button>
           {session?.user ? (
             <>
-              <span className="text-sm text-muted">
+              <Link
+                href="/mypage"
+                className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors"
+              >
+                <UserCircle className="h-4 w-4" />
                 {session.user.name}
-                <span className="ml-1.5 inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                <span className="inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
                   {session.user.role}
                 </span>
-              </span>
+              </Link>
               <button
                 onClick={() => signOut()}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
@@ -122,9 +143,14 @@ export function Header() {
             <hr className="border-border" />
             {session?.user ? (
               <>
-                <p className="text-sm text-muted">
+                <Link
+                  href="/mypage"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-foreground"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <UserCircle className="h-4 w-4" />
                   {session.user.name} ({session.user.role})
-                </p>
+                </Link>
                 <button
                   onClick={() => {
                     signOut();
@@ -153,6 +179,18 @@ export function Header() {
                 </Link>
               </>
             )}
+            <hr className="border-border" />
+            <button
+              onClick={toggleTheme}
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-foreground"
+            >
+              {resolvedTheme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+              {resolvedTheme === "dark" ? "라이트 모드" : "다크 모드"}
+            </button>
           </div>
         </div>
       )}

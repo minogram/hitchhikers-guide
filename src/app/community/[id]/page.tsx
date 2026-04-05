@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Clock, MessageCircle, User } from "lucide-react";
-import { samplePosts } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { DeletePostButton } from "./DeletePostButton";
+import { CommentSection } from "./CommentSection";
 
 const typeLabel: Record<string, string> = {
   notice: "공지사항",
@@ -16,11 +19,27 @@ interface Props {
 
 export default async function PostDetailPage({ params }: Props) {
   const { id } = await params;
-  const post = samplePosts.find((p) => p.id === id);
+  const post = await prisma.post.findUnique({
+    where: { id },
+    include: {
+      author: { select: { name: true } },
+      comments: {
+        orderBy: { createdAt: "asc" },
+        include: { author: { select: { name: true } } },
+      },
+    },
+  });
 
   if (!post) {
     notFound();
   }
+
+  const session = await auth();
+  const currentUserId = session?.user?.id;
+  const role = (session?.user?.role as string) ?? "";
+  const isOwner = currentUserId === post.authorId;
+  const isPrivileged = role === "admin" || role === "manager";
+  const canModify = isOwner || isPrivileged;
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 lg:px-8">
@@ -43,7 +62,7 @@ export default async function PostDetailPage({ params }: Props) {
           <div className="flex items-center gap-4 text-sm text-muted">
             <span className="inline-flex items-center gap-1">
               <User className="h-4 w-4" />
-              {post.authorName}
+              {post.author.name}
             </span>
             <span className="inline-flex items-center gap-1">
               <Clock className="h-4 w-4" />
@@ -51,10 +70,22 @@ export default async function PostDetailPage({ params }: Props) {
             </span>
             <span className="inline-flex items-center gap-1">
               <MessageCircle className="h-4 w-4" />
-              {post.commentCount}개의 댓글
+              {post.comments.length}개의 댓글
             </span>
           </div>
         </div>
+
+        {canModify && (
+          <div className="flex gap-2 mb-6">
+            <Link
+              href={`/community/${post.id}/edit`}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-card transition-colors"
+            >
+              수정
+            </Link>
+            <DeletePostButton postId={post.id} />
+          </div>
+        )}
 
         <div className="border-t border-border pt-8 mb-12">
           <p className="text-muted leading-relaxed whitespace-pre-wrap">
@@ -63,30 +94,19 @@ export default async function PostDetailPage({ params }: Props) {
         </div>
 
         {/* Comments Section */}
-        <section className="border-t border-border pt-8">
-          <h2 className="text-lg font-bold mb-6">
-            댓글 {post.commentCount}개
-          </h2>
-          <div className="rounded-xl border border-border bg-card p-4 mb-6">
-            <textarea
-              placeholder="댓글을 작성하세요... (로그인 필요)"
-              className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted"
-              rows={3}
-              disabled
-            />
-            <div className="flex justify-end mt-2">
-              <button
-                disabled
-                className="rounded-full bg-foreground/50 px-4 py-2 text-xs font-medium text-background cursor-not-allowed"
-              >
-                댓글 작성
-              </button>
-            </div>
-          </div>
-          <p className="text-center text-sm text-muted py-8">
-            로그인 후 댓글을 작성할 수 있습니다.
-          </p>
-        </section>
+        <CommentSection
+          postId={post.id}
+          comments={post.comments.map((c) => ({
+            id: c.id,
+            content: c.content,
+            authorId: c.authorId,
+            authorName: c.author.name,
+            createdAt: c.createdAt.toISOString(),
+          }))}
+          currentUserId={currentUserId}
+          isPrivileged={isPrivileged}
+          isLoggedIn={!!session?.user}
+        />
       </article>
     </div>
   );
