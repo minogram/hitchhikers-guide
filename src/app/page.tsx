@@ -1,0 +1,188 @@
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, Zap, Users, BookOpen } from "lucide-react";
+import { sampleApps } from "@/lib/data";
+
+export default function Home() {
+  return (
+    <>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-40">
+          <div className="max-w-2xl">
+            <p className="text-sm font-medium text-accent uppercase tracking-widest mb-4">
+              Curating · Connecting · Creating
+            </p>
+            <h1 className="font-serif text-5xl font-black leading-tight tracking-tight sm:text-7xl">
+              The Hitchhiker&apos;s
+              <br />
+              <span className="text-accent">Guide</span> to
+              <br />
+              Fashion AI
+            </h1>
+            <p className="mt-8 text-lg leading-relaxed text-muted max-w-lg">
+              패션 산업에 특화된 AI 도구를 탐색하고, 전문가들과 연결되며,
+              새로운 기술적 가치를 함께 창조하세요.
+            </p>
+            <div className="mt-10 flex items-center gap-4">
+              <Link
+                href="/catalog"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
+              >
+                카탈로그 탐색
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold hover:bg-card-hover transition-colors"
+              >
+                무료 가입
+              </Link>
+            </div>
+          </div>
+
+          {/* Decorative element */}
+          <div className="absolute -top-20 right-0 hidden lg:block opacity-10">
+            <div className="text-[20rem] font-serif font-black text-foreground leading-none select-none">
+              AI
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="border-t border-border bg-card">
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
+            <div className="group">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+                <Zap className="h-6 w-6 text-accent" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">AI 도구 큐레이션</h3>
+              <p className="text-sm text-muted leading-relaxed">
+                Fashion, Bags, Shoes, Beauty 등 산업별로 엄선된 AI 도구를
+                카탈로그에서 탐색하세요.
+              </p>
+            </div>
+            <div className="group">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+                <Users className="h-6 w-6 text-accent" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">전문가 커뮤니티</h3>
+              <p className="text-sm text-muted leading-relaxed">
+                패션 테크 전문가들과 포럼에서 소통하고, 구인구직 게시판으로
+                인재를 찾으세요.
+              </p>
+            </div>
+            <div className="group">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+                <BookOpen className="h-6 w-6 text-accent" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">인사이트 아티클</h3>
+              <p className="text-sm text-muted leading-relaxed">
+                AI 패션 분야의 깊이 있는 트렌드 분석과 전문 아티클을
+                만나보세요.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Apps Preview */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="text-sm font-medium text-accent uppercase tracking-widest mb-2">
+                Featured
+              </p>
+              <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-4xl">
+                주목할 AI 도구
+              </h2>
+            </div>
+            <Link
+              href="/catalog"
+              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-muted hover:text-foreground transition-colors"
+            >
+              전체 보기
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {sampleApps.slice(0, 3).map((app) => (
+              <Link
+                key={app.id}
+                href={`/catalog/${app.id}`}
+                className="group rounded-2xl border border-border bg-card p-6 hover:bg-card-hover transition-colors"
+              >
+                <div className="aspect-[4/3] rounded-xl bg-background overflow-hidden mb-4">
+                  <Image
+                    src={app.thumbnail}
+                    alt={app.title}
+                    width={400}
+                    height={300}
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {app.industryTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {app.processTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <h3 className="text-lg font-bold mb-1 group-hover:text-accent transition-colors">
+                  {app.title}
+                </h3>
+                <p className="text-sm text-muted leading-relaxed line-clamp-2">
+                  {app.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center sm:hidden">
+            <Link
+              href="/catalog"
+              className="inline-flex items-center gap-1 text-sm font-medium text-accent"
+            >
+              전체 보기
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="border-t border-border bg-foreground text-background">
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 text-center">
+          <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-4xl mb-4">
+            패션의 미래를 함께 만들어가요
+          </h2>
+          <p className="text-background/60 mb-8 max-w-md mx-auto">
+            지금 가입하고 패션 AI의 최전선에서 활동하는 커뮤니티에 참여하세요.
+          </p>
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-2 rounded-full bg-accent px-8 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+          >
+            시작하기
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+    </>
+  );
+}

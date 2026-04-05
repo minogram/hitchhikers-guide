@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("user") // admin | manager | user
+  profileImg String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  apps     AppCard[]
+  posts    Post[]
+  comments Comment[]
+}
+
+model AppCard {
+  id                String   @id @default(cuid())
+  title             String
+  thumbnail         String   @default("/placeholder-app.svg")
+  description       String
+  detailDescription String?
+  link              String
+  industryTags      String   // JSON array stored as string
+  processTags       String   // JSON array stored as string
+  hasGeminiDemo     Boolean  @default(false)
+  createdBy         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  author User @relation(fields: [createdBy], references: [id])
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  type      String   // notice | forum | job | article
+  title     String
+  content   String
+  isPinned  Boolean  @default(false)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User      @relation(fields: [authorId], references: [id])
+  comments Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  authorId  String
+  createdAt DateTime @default(now())
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id])
+}

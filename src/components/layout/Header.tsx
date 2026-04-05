@@ -1,0 +1,161 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { Menu, X, Sparkles, LogOut, Shield } from "lucide-react";
+
+const navigation = [
+  { name: "카탈로그", href: "/catalog" },
+  { name: "커뮤니티", href: "/community" },
+  { name: "아티클", href: "/community?type=article" },
+  { name: "구인구직", href: "/community?type=job" },
+];
+
+export function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "admin";
+  const isManager = session?.user?.role === "manager";
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 group">
+          <Sparkles className="h-6 w-6 text-accent" />
+          <span className="font-serif text-xl font-bold tracking-tight">
+            HGFAI
+          </span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex md:items-center md:gap-8">
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className="text-sm font-medium text-muted hover:text-foreground transition-colors"
+            >
+              {item.name}
+            </Link>
+          ))}
+          {(isAdmin || isManager) && (
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-foreground transition-colors"
+            >
+              <Shield className="h-3.5 w-3.5" />
+              관리
+            </Link>
+          )}
+        </div>
+
+        {/* Auth Buttons */}
+        <div className="hidden md:flex md:items-center md:gap-4">
+          {session?.user ? (
+            <>
+              <span className="text-sm text-muted">
+                {session.user.name}
+                <span className="ml-1.5 inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                  {session.user.role}
+                </span>
+              </span>
+              <button
+                onClick={() => signOut()}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="text-sm font-medium text-muted hover:text-foreground transition-colors"
+              >
+                로그인
+              </Link>
+              <Link
+                href="/register"
+                className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 transition-opacity"
+              >
+                회원가입
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* Mobile menu button */}
+        <button
+          className="md:hidden"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </nav>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-background">
+          <div className="px-6 py-4 space-y-3">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="block text-sm font-medium text-muted hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+            {(isAdmin || isManager) && (
+              <Link
+                href="/admin"
+                className="block text-sm font-medium text-accent hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                관리자
+              </Link>
+            )}
+            <hr className="border-border" />
+            {session?.user ? (
+              <>
+                <p className="text-sm text-muted">
+                  {session.user.name} ({session.user.role})
+                </p>
+                <button
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="block text-sm font-medium text-muted hover:text-foreground"
+                >
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="block text-sm font-medium text-muted hover:text-foreground"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  로그인
+                </Link>
+                <Link
+                  href="/register"
+                  className="block text-sm font-medium text-accent hover:text-foreground"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  회원가입
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}

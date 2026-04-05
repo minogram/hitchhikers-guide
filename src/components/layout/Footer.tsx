@@ -1,0 +1,69 @@
+import { Sparkles } from "lucide-react";
+import Link from "next/link";
+
+export function Footer() {
+  return (
+    <footer className="border-t border-border bg-background">
+      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          {/* Brand */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="h-5 w-5 text-accent" />
+              <span className="font-serif text-lg font-bold">HGFAI</span>
+            </div>
+            <p className="text-sm text-muted leading-relaxed">
+              Hitchhiker&apos;s Guide to Fashion AI
+              <br />
+              패션과 AI의 교차점에서 새로운 가치를 창조합니다.
+            </p>
+          </div>
+
+          {/* Links */}
+          <div>
+            <h3 className="text-sm font-semibold mb-4">서비스</h3>
+            <ul className="space-y-2 text-sm text-muted">
+              <li>
+                <Link href="/catalog" className="hover:text-foreground transition-colors">
+                  AI 앱 카탈로그
+                </Link>
+              </li>
+              <li>
+                <Link href="/community" className="hover:text-foreground transition-colors">
+                  커뮤니티
+                </Link>
+              </li>
+              <li>
+                <Link href="/community?type=job" className="hover:text-foreground transition-colors">
+                  구인구직
+                </Link>
+              </li>
+              <li>
+                <Link href="/community?type=article" className="hover:text-foreground transition-colors">
+                  아티클
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="text-sm font-semibold mb-4">문의</h3>
+            <ul className="space-y-2 text-sm text-muted">
+              <li>admin@hitchhikers.com</li>
+              <li>
+                <Link href="/community?type=forum" className="hover:text-foreground transition-colors">
+                  포럼에서 질문하기
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-8 border-t border-border text-center text-xs text-muted">
+          © 2025 Hitchhiker&apos;s Guide to Fashion AI. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  );
+}
