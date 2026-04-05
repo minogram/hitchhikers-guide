@@ -1,22 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, Filter, Sparkles } from "lucide-react";
-import { sampleApps } from "@/lib/data";
 import type { IndustryTag, ProcessTag } from "@/lib/types";
+
+type CatalogApp = {
+  id: string;
+  title: string;
+  thumbnail: string;
+  description: string;
+  industryTags: string[];
+  processTags: string[];
+  hasGeminiDemo: boolean;
+};
 
 const industryFilters: IndustryTag[] = ["Fashion", "Bags", "Shoes", "Beauty"];
 const processFilters: ProcessTag[] = ["Planning", "Design", "Production", "Commerce"];
 
 export default function CatalogPage() {
+  const [apps, setApps] = useState<CatalogApp[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState<IndustryTag | null>(null);
   const [selectedProcess, setSelectedProcess] = useState<ProcessTag | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredApps = sampleApps.filter((app) => {
+  useEffect(() => {
+    fetch("/api/apps")
+      .then((res) => res.json())
+      .then((data) => {
+        setApps(data);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredApps = apps.filter((app) => {
     const matchesSearch =
       !searchQuery ||
       app.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -122,7 +142,7 @@ export default function CatalogPage() {
 
       {/* Results Count */}
       <p className="mb-6 text-sm text-muted">
-        {filteredApps.length}개의 앱
+        {loading ? "로딩 중..." : `${filteredApps.length}개의 앱`}
       </p>
 
       {/* App Grid */}

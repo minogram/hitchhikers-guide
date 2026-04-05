@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { Users, AppWindow, FileText, Settings, Shield, Plus } from "lucide-react";
+import { requireRole } from "@/lib/auth-guard";
+import { getAdminStats, getUsers } from "@/app/actions/admin";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  await requireRole("admin");
+  const [stats, users] = await Promise.all([getAdminStats(), getUsers()]);
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-12 lg:px-8">
       {/* Header */}
@@ -20,10 +25,10 @@ export default function AdminPage() {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-12">
         {[
-          { label: "전체 사용자", value: "128", icon: Users },
-          { label: "등록된 앱", value: "6", icon: AppWindow },
-          { label: "게시글", value: "42", icon: FileText },
-          { label: "매니저", value: "3", icon: Shield },
+          { label: "전체 사용자", value: stats?.userCount ?? 0, icon: Users },
+          { label: "등록된 앱", value: stats?.appCount ?? 0, icon: AppWindow },
+          { label: "게시글", value: stats?.postCount ?? 0, icon: FileText },
+          { label: "매니저", value: stats?.managerCount ?? 0, icon: Shield },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -94,9 +99,14 @@ export default function AdminPage() {
         </Link>
       </div>
 
-      {/* User Management Preview */}
+      {/* Recent Users */}
       <section className="mt-12">
-        <h2 className="text-xl font-bold mb-6">최근 가입 사용자</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold">최근 가입 사용자</h2>
+          <Link href="/admin/users" className="text-sm text-accent hover:underline">
+            전체 보기
+          </Link>
+        </div>
         <div className="rounded-2xl border border-border bg-card overflow-hidden">
           <table className="w-full text-sm">
             <thead>
@@ -104,22 +114,20 @@ export default function AdminPage() {
                 <th className="text-left px-6 py-3 font-medium text-muted">이름</th>
                 <th className="text-left px-6 py-3 font-medium text-muted">이메일</th>
                 <th className="text-left px-6 py-3 font-medium text-muted">등급</th>
-                <th className="text-left px-6 py-3 font-medium text-muted">작업</th>
+                <th className="text-left px-6 py-3 font-medium text-muted">가입일</th>
               </tr>
             </thead>
             <tbody>
-              {[
-                { name: "김디자이너", email: "designer@example.com", role: "user" },
-                { name: "박매니저", email: "manager@example.com", role: "manager" },
-                { name: "이마케터", email: "marketer@example.com", role: "user" },
-              ].map((user) => (
-                <tr key={user.email} className="border-b border-border last:border-0">
+              {users.slice(0, 5).map((user) => (
+                <tr key={user.id} className="border-b border-border last:border-0">
                   <td className="px-6 py-4 font-medium">{user.name}</td>
                   <td className="px-6 py-4 text-muted">{user.email}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        user.role === "manager"
+                        user.role === "admin"
+                          ? "bg-red-500/10 text-red-500"
+                          : user.role === "manager"
                           ? "bg-purple-500/10 text-purple-500"
                           : "bg-foreground/5 text-muted"
                       }`}
@@ -127,10 +135,8 @@ export default function AdminPage() {
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <button className="text-xs text-accent hover:underline">
-                      등급 변경
-                    </button>
+                  <td className="px-6 py-4 text-muted">
+                    {new Date(user.createdAt).toLocaleDateString("ko-KR")}
                   </td>
                 </tr>
               ))}

@@ -103,6 +103,26 @@ export default function RegisterPage() {
               )}
             </div>
 
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+                비밀번호 확인
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  placeholder="비밀번호를 다시 입력하세요"
+                  className="w-full rounded-xl border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
+                />
+              </div>
+              {state?.errors?.confirmPassword && (
+                <p className="mt-1 text-xs text-accent">{state.errors.confirmPassword[0]}</p>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={pending}

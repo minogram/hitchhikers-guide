@@ -20,6 +20,7 @@ export async function signup(
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
   });
 
   if (!validatedFields.success) {
@@ -71,7 +72,7 @@ export async function login(
     await signIn("credentials", {
       email: validatedFields.data.email,
       password: validatedFields.data.password,
-      redirect: false,
+      redirectTo: "/",
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -80,5 +81,5 @@ export async function login(
     throw error;
   }
 
-  redirect("/");
+  return {};
 }

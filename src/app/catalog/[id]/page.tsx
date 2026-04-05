@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
-import { sampleApps } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -10,11 +10,14 @@ interface Props {
 
 export default async function AppDetailPage({ params }: Props) {
   const { id } = await params;
-  const app = sampleApps.find((a) => a.id === id);
+  const app = await prisma.appCard.findUnique({ where: { id } });
 
   if (!app) {
     notFound();
   }
+
+  const industryTags: string[] = JSON.parse(app.industryTags);
+  const processTags: string[] = JSON.parse(app.processTags);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
@@ -40,7 +43,7 @@ export default async function AppDetailPage({ params }: Props) {
         </div>
         <div className="flex flex-col justify-center">
           <div className="flex flex-wrap gap-2 mb-4">
-            {app.industryTags.map((tag) => (
+            {industryTags.map((tag: string) => (
               <span
                 key={tag}
                 className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
@@ -48,7 +51,7 @@ export default async function AppDetailPage({ params }: Props) {
                 {tag}
               </span>
             ))}
-            {app.processTags.map((tag) => (
+            {processTags.map((tag: string) => (
               <span
                 key={tag}
                 className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted"

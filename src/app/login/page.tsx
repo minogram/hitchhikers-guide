@@ -1,12 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Mail, Lock, ArrowRight } from "lucide-react";
-import { login } from "@/app/actions/auth";
 
 export default function LoginPage() {
-  const [state, action, pending] = useActionState(login, undefined);
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setPending(true);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) {
+      setError("이메일과 비밀번호를 입력해주세요.");
+      setPending(false);
+      return;
+    }
+
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      setPending(false);
+    } else {
+      router.push("/");
+      router.refresh();
+    }
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -20,7 +53,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form action={action} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium mb-2">
               이메일
@@ -36,9 +69,7 @@ export default function LoginPage() {
                 className="w-full rounded-xl border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
               />
             </div>
-            {state?.errors?.email && (
-              <p className="mt-1 text-xs text-accent">{state.errors.email[0]}</p>
-            )}
+
           </div>
 
           <div>
@@ -56,13 +87,11 @@ export default function LoginPage() {
                 className="w-full rounded-xl border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
               />
             </div>
-            {state?.errors?.password && (
-              <p className="mt-1 text-xs text-accent">{state.errors.password[0]}</p>
-            )}
+
           </div>
 
-          {state?.message && (
-            <p className="text-sm text-accent text-center">{state.message}</p>
+          {error && (
+            <p className="text-sm text-accent text-center">{error}</p>
           )}
 
           <button

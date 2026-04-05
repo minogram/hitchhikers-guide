@@ -15,6 +15,10 @@ export const SignupFormSchema = z.object({
     .regex(/[a-zA-Z]/, { message: "영문자를 1자 이상 포함해야 합니다." })
     .regex(/[0-9]/, { message: "숫자를 1자 이상 포함해야 합니다." })
     .trim(),
+  confirmPassword: z.string().trim(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "비밀번호가 일치하지 않습니다.",
+  path: ["confirmPassword"],
 });
 
 export const LoginFormSchema = z.object({
@@ -33,6 +37,7 @@ export type SignupFormState = {
     name?: string[];
     email?: string[];
     password?: string[];
+    confirmPassword?: string[];
   };
   message?: string;
   success?: boolean;
