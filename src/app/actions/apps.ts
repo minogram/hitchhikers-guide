@@ -4,6 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import * as z from "zod";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const AppFormSchema = z.object({
   title: z.string().min(1, "앱 이름을 입력해주세요."),
@@ -127,6 +134,16 @@ export async function updateApp(
 export async function deleteApp(appId: string) {
   const session = await requireAdminOrManager();
   if (!session) return { error: "권한이 없습니다." };
+
+  const app = await prisma.appCard.findUnique({ where: { id: appId } });
+
+  if (app?.thumbnail) {
+    // URL에서 public_id 추출: .../upload/v123456/{public_id}.ext
+    const match = app.thumbnail.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
+    if (match) {
+      await cloudinary.uploader.destroy(match[1]).catch(() => null);
+    }
+  }
 
   await prisma.appCard.delete({ where: { id: appId } });
 
