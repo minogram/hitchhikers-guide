@@ -83,7 +83,7 @@ export function Header() {
                 )}
               </Link>
               <button
-                onClick={() => signOut()}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
               >
                 <LogOut className="h-4 w-4" />
@@ -153,7 +153,7 @@ export function Header() {
                 </Link>
                 <button
                   onClick={() => {
-                    signOut();
+                    signOut({ callbackUrl: "/" });
                     setMobileMenuOpen(false);
                   }}
                   className="block text-sm font-medium text-muted hover:text-foreground"

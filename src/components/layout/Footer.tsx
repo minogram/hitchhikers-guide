@@ -33,16 +33,6 @@ export function Footer() {
                   커뮤니티
                 </Link>
               </li>
-              <li>
-                <Link href="/community?type=job" className="hover:text-foreground transition-colors">
-                  구인구직
-                </Link>
-              </li>
-              <li>
-                <Link href="/community?type=article" className="hover:text-foreground transition-colors">
-                  아티클
-                </Link>
-              </li>
             </ul>
           </div>
 
