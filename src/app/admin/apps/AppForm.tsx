@@ -1,12 +1,11 @@
 "use client";
 
-import { useActionState, useState, useRef } from "react";
+import { useActionState, useState, useRef, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Sparkles, ImagePlus } from "lucide-react";
+import { Sparkles, ImagePlus, Plus } from "lucide-react";
 import type { AppFormState } from "@/app/actions/apps";
-
-const industryOptions = ["Fashion", "Bags", "Shoes", "Beauty"];
-const processOptions = ["Planning", "Design", "Production", "Commerce"];
+import { addTagOption } from "@/app/actions/tags";
 
 interface AppFormProps {
   action: (prevState: AppFormState | undefined, formData: FormData) => Promise<AppFormState>;
@@ -21,18 +20,43 @@ interface AppFormProps {
     thumbnail?: string;
   };
   submitLabel: string;
+  redirectTo?: string;
+  industryOptions: string[];
+  processOptions: string[];
 }
 
-export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
+export function AppForm({ action, initialData, submitLabel, redirectTo, industryOptions: initialIndustryOptions, processOptions: initialProcessOptions }: AppFormProps) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(action, undefined);
+  const [industryOptions, setIndustryOptions] = useState<string[]>(initialIndustryOptions);
+  const [processOptions, setProcessOptions] = useState<string[]>(initialProcessOptions);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.thumbnail ?? null);
   const [thumbnailUrl, setThumbnailUrl] = useState<string>(initialData?.thumbnail ?? "");
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const [newIndustryTag, setNewIndustryTag] = useState("");
+  const [newProcessTag, setNewProcessTag] = useState("");
+  const [addingTagError, setAddingTagError] = useState<string | null>(null);
+  const [isAddingTag, startAddingTag] = useTransition();
+
+  async function handleAddTag(type: "industry" | "process", label: string, setter: (v: string) => void, listSetter: (fn: (prev: string[]) => string[]) => void) {
+    const trimmed = label.trim();
+    if (!trimmed) return;
+    setAddingTagError(null);
+    startAddingTag(async () => {
+      const result = await addTagOption(type, trimmed);
+      if (result.error) {
+        setAddingTagError(result.error);
+      } else {
+        listSetter((prev) => [...prev, trimmed]);
+        setter("");
+      }
+    });
+  }
+
+  async function uploadFile(file: File) {
     setPreviewUrl(URL.createObjectURL(file));
     setUploading(true);
     try {
@@ -46,7 +70,37 @@ export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
     }
   }
 
-  if (state?.success) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(false);
+  }
+
+  async function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    await uploadFile(file);
+  }
+
+  useEffect(() => {
+    if (state?.success && redirectTo) {
+      router.push(redirectTo);
+    }
+  }, [state?.success, redirectTo, router]);
+
+  if (state?.success && !redirectTo) {
     return (
       <div className="rounded-2xl border border-accent/30 bg-accent/5 p-8 text-center">
         <p className="text-accent font-medium">{state.message}</p>
@@ -66,19 +120,33 @@ export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
       <div>
         <label className="block text-sm font-medium mb-2">썸네일 이미지</label>
         <div
-          className="relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border hover:border-accent transition-colors overflow-hidden"
+          className={`relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed overflow-hidden transition-colors ${
+            isDragging
+              ? "border-accent bg-accent/10"
+              : "border-border hover:border-accent"
+          }`}
           style={{ aspectRatio: "4/3", maxHeight: 240 }}
           onClick={() => fileInputRef.current?.click()}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
           {previewUrl ? (
             <Image src={previewUrl} alt="thumbnail preview" fill className="object-cover" unoptimized />
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted">
               <ImagePlus className="h-8 w-8" />
-              <span className="text-sm">클릭하여 이미지 선택</span>
+              <span className="text-sm">
+                {isDragging ? "여기에 놓으세요" : "클릭하거나 이미지를 드래그하세요"}
+              </span>
             </div>
           )}
-          {previewUrl && (
+          {isDragging && previewUrl && (
+            <div className="absolute inset-0 flex items-center justify-center bg-accent/40">
+              <span className="text-white text-sm font-medium">여기에 놓으세요</span>
+            </div>
+          )}
+          {!isDragging && previewUrl && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
               <span className="text-white text-sm font-medium">{uploading ? "업로드 중..." : "이미지 변경"}</span>
             </div>
@@ -92,7 +160,7 @@ export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
           onChange={handleFileChange}
         />
         <input type="hidden" name="thumbnail" value={thumbnailUrl} />
-        <p className="mt-1 text-xs text-muted">PNG, JPG, WebP (권장 4:3 비율)</p>
+        <p className="mt-1 text-xs text-muted">PNG, JPG, WebP (권장 4:3 비율) · 클릭 또는 드래그 앤 드롭</p>
       </div>
 
       <div>
@@ -178,6 +246,30 @@ export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
             </label>
           ))}
         </div>
+        <div className="mt-2 flex items-center gap-2">
+          <input
+            type="text"
+            value={newIndustryTag}
+            onChange={(e) => setNewIndustryTag(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddTag("industry", newIndustryTag, setNewIndustryTag, setIndustryOptions);
+              }
+            }}
+            placeholder="새 카테고리 입력"
+            className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent transition-colors w-40"
+          />
+          <button
+            type="button"
+            disabled={isAddingTag || !newIndustryTag.trim()}
+            onClick={() => handleAddTag("industry", newIndustryTag, setNewIndustryTag, setIndustryOptions)}
+            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            추가
+          </button>
+        </div>
         {state?.errors?.industryTags && (
           <p className="mt-1 text-xs text-red-500">{state.errors.industryTags[0]}</p>
         )}
@@ -201,6 +293,33 @@ export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
             </label>
           ))}
         </div>
+        <div className="mt-2 flex items-center gap-2">
+          <input
+            type="text"
+            value={newProcessTag}
+            onChange={(e) => setNewProcessTag(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddTag("process", newProcessTag, setNewProcessTag, setProcessOptions);
+              }
+            }}
+            placeholder="새 카테고리 입력"
+            className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent transition-colors w-40"
+          />
+          <button
+            type="button"
+            disabled={isAddingTag || !newProcessTag.trim()}
+            onClick={() => handleAddTag("process", newProcessTag, setNewProcessTag, setProcessOptions)}
+            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            추가
+          </button>
+        </div>
+        {addingTagError && (
+          <p className="mt-1 text-xs text-red-500">{addingTagError}</p>
+        )}
         {state?.errors?.processTags && (
           <p className="mt-1 text-xs text-red-500">{state.errors.processTags[0]}</p>
         )}

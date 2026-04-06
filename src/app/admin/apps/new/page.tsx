@@ -3,9 +3,11 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { AppForm } from "../AppForm";
 import { createApp } from "@/app/actions/apps";
+import { getTagOptions } from "@/app/actions/tags";
 
 export default async function NewAppPage() {
   await requireRole("admin", "manager");
+  const { industry, process } = await getTagOptions();
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-12 lg:px-8">
@@ -26,7 +28,12 @@ export default async function NewAppPage() {
         </p>
       </div>
 
-      <AppForm action={createApp} submitLabel="앱 등록" />
+      <AppForm
+        action={createApp}
+        submitLabel="앱 등록"
+        industryOptions={industry}
+        processOptions={process}
+      />
     </div>
   );
 }

@@ -15,9 +15,11 @@ interface EditAppFormProps {
     hasGeminiDemo: boolean;
     thumbnail: string;
   };
+  industryOptions: string[];
+  processOptions: string[];
 }
 
-export function EditAppForm({ appId, initialData }: EditAppFormProps) {
+export function EditAppForm({ appId, initialData, industryOptions, processOptions }: EditAppFormProps) {
   const boundAction = async (
     prevState: AppFormState | undefined,
     formData: FormData
@@ -30,6 +32,9 @@ export function EditAppForm({ appId, initialData }: EditAppFormProps) {
       action={boundAction}
       initialData={initialData}
       submitLabel="수정 저장"
+      redirectTo={`/catalog/${appId}`}
+      industryOptions={industryOptions}
+      processOptions={processOptions}
     />
   );
 }

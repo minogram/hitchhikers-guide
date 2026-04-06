@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { EditAppForm } from "./EditAppForm";
+import { getTagOptions } from "@/app/actions/tags";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -12,7 +13,7 @@ interface Props {
 export default async function EditAppPage({ params }: Props) {
   await requireRole("admin", "manager");
   const { id } = await params;
-  const app = await getAppById(id);
+  const [app, { industry, process }] = await Promise.all([getAppById(id), getTagOptions()]);
 
   if (!app) notFound();
 
@@ -46,7 +47,7 @@ export default async function EditAppPage({ params }: Props) {
         </p>
       </div>
 
-      <EditAppForm appId={id} initialData={initialData} />
+      <EditAppForm appId={id} initialData={initialData} industryOptions={industry} processOptions={process} />
     </div>
   );
 }

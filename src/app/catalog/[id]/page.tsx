@@ -106,7 +106,7 @@ export default async function AppDetailPage({ params }: Props) {
       <section className="border-t border-border pt-8 mb-12">
         <h2 className="text-xl font-bold mb-4">상세 설명</h2>
         <div className="prose prose-neutral dark:prose-invert max-w-none">
-          <p className="text-muted leading-relaxed">
+          <p className="text-muted leading-relaxed whitespace-pre-wrap">
             {app.detailDescription || app.description}
           </p>
         </div>
