@@ -44,13 +44,7 @@
 - [x] 앱 카달로그 관리에서 키워드로 검색 가능하게
 - [x] 사용자 관리에서 키워드로 검색 가능하게
 - [x] 아티클 관리 기능 세부 구현
-
-### Phase 7: seed 계정
-
-- [ ] admin@falab.kr pass.admin 최고 관리자 계정
-- [ ] user1@falab.kr pass.user1 사용자1 계정
-- [ ] manager1@falab.kr pass.manager1 매니저1 계정
-
+- [x] 바로가기 앱 편집 
 
 ### 나중에 할일들: 이 항목을 구현하지 마세요
 
