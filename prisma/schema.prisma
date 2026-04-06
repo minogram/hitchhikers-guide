@@ -23,6 +23,7 @@ model User {
   apps     AppCard[]
   posts    Post[]
   comments Comment[]
+  likes    AppLike[]
 }
 
 model AppCard {
@@ -35,11 +36,13 @@ model AppCard {
   industryTags      String   // JSON array stored as string
   processTags       String   // JSON array stored as string
   hasGeminiDemo     Boolean  @default(false)
+  likeCount         Int      @default(0)
   createdBy         String
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  author User @relation(fields: [createdBy], references: [id])
+  author User      @relation(fields: [createdBy], references: [id])
+  likes  AppLike[]
 }
 
 model Post {
@@ -74,4 +77,15 @@ model TagOption {
   createdAt DateTime @default(now())
 
   @@unique([type, label])
+}
+
+model AppLike {
+  userId    String
+  appId     String
+  createdAt DateTime @default(now())
+
+  user User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  app  AppCard @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([userId, appId])
 }

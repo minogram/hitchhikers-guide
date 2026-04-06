@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink, Sparkles, Pencil } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { LikeButton } from "@/components/LikeButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -20,6 +21,11 @@ export default async function AppDetailPage({ params }: Props) {
   const session = await auth().catch(() => null);
   const role = session?.user?.role;
   const isPrivileged = role === "admin" || role === "manager";
+  const userId = session?.user?.id ?? null;
+
+  const isLiked = userId
+    ? !!(await prisma.appLike.findUnique({ where: { userId_appId: { userId, appId: id } } }))
+    : false;
 
   const industryTags: string[] = JSON.parse(app.industryTags);
   const processTags: string[] = JSON.parse(app.processTags);
@@ -82,7 +88,7 @@ export default async function AppDetailPage({ params }: Props) {
           <p className="text-muted leading-relaxed mb-6">
             {app.description}
           </p>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <a
               href={app.link}
               target="_blank"
@@ -98,6 +104,11 @@ export default async function AppDetailPage({ params }: Props) {
                 AI 데모
               </button>
             )}
+            <LikeButton
+              appId={app.id}
+              initialLiked={isLiked}
+              initialCount={app.likeCount}
+            />
           </div>
         </div>
       </div>

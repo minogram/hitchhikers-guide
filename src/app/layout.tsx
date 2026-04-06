@@ -35,7 +35,12 @@ export default function RootLayout({
       className={`${notoSansKr.variable} ${playfair.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
+      <body className="min-h-full flex flex-col font-sans">
+        <Providers>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </Providers>
         <Script
           id="theme-init"
           strategy="beforeInteractive"
@@ -43,13 +48,6 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);if(d)document.documentElement.classList.add("dark")}catch(e){}})()`,
           }}
         />
-      </head>
-      <body className="min-h-full flex flex-col font-sans">
-        <Providers>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </Providers>
       </body>
     </html>
   );

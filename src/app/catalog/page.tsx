@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, Filter, Sparkles } from "lucide-react";
-import type { IndustryTag, ProcessTag } from "@/lib/types";
+import { LikeButton } from "@/components/LikeButton";
 
 type CatalogApp = {
   id: string;
@@ -14,17 +14,18 @@ type CatalogApp = {
   industryTags: string[];
   processTags: string[];
   hasGeminiDemo: boolean;
+  likeCount: number;
+  isLiked: boolean;
 };
-
-const industryFilters: IndustryTag[] = ["Fashion", "Bags", "Shoes", "Beauty"];
-const processFilters: ProcessTag[] = ["Planning", "Design", "Production", "Commerce"];
 
 export default function CatalogPage() {
   const [apps, setApps] = useState<CatalogApp[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIndustry, setSelectedIndustry] = useState<IndustryTag | null>(null);
-  const [selectedProcess, setSelectedProcess] = useState<ProcessTag | null>(null);
+  const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
+  const [selectedProcess, setSelectedProcess] = useState<string | null>(null);
+  const [industryFilters, setIndustryFilters] = useState<string[]>([]);
+  const [processFilters, setProcessFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
@@ -33,6 +34,12 @@ export default function CatalogPage() {
       .then((data) => {
         setApps(data);
         setLoading(false);
+      });
+    fetch("/api/tags")
+      .then((res) => res.json())
+      .then((data) => {
+        setIndustryFilters(data.industry ?? []);
+        setProcessFilters(data.process ?? []);
       });
   }, []);
 
@@ -168,7 +175,21 @@ export default function CatalogPage() {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <h3 className="text-lg font-bold group-hover:text-accent transition-colors leading-snug">
+                {app.title}
+              </h3>
+              <LikeButton
+                appId={app.id}
+                initialLiked={app.isLiked}
+                initialCount={app.likeCount}
+                size="sm"
+              />
+            </div>
+            <p className="text-sm text-muted leading-relaxed line-clamp-2 mb-3">
+              {app.description}
+            </p>
+            <div className="flex flex-wrap gap-2">
               {app.industryTags.map((tag) => (
                 <span
                   key={tag}
@@ -186,12 +207,6 @@ export default function CatalogPage() {
                 </span>
               ))}
             </div>
-            <h3 className="text-lg font-bold mb-1 group-hover:text-accent transition-colors">
-              {app.title}
-            </h3>
-            <p className="text-sm text-muted leading-relaxed line-clamp-2">
-              {app.description}
-            </p>
           </Link>
         ))}
       </div>

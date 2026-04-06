@@ -1,9 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 
 export async function GET() {
+  const session = await auth().catch(() => null);
+  const userId = session?.user?.id ?? null;
+
   const apps = await prisma.appCard.findMany({
     orderBy: { createdAt: "desc" },
+    include: userId
+      ? { likes: { where: { userId }, select: { userId: true } } }
+      : undefined,
   });
 
   const formatted = apps.map((app) => ({
@@ -14,6 +21,8 @@ export async function GET() {
     industryTags: JSON.parse(app.industryTags),
     processTags: JSON.parse(app.processTags),
     hasGeminiDemo: app.hasGeminiDemo,
+    likeCount: app.likeCount,
+    isLiked: userId ? (app.likes?.length ?? 0) > 0 : false,
   }));
 
   return NextResponse.json(formatted);

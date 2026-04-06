@@ -3,10 +3,24 @@ import Image from "next/image";
 import { ArrowRight, Zap, Users, BookOpen } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { LikeButton } from "@/components/LikeButton";
 
 export default async function Home() {
   const session = await auth().catch(() => null);
-  const featuredApps = await prisma.appCard.findMany({ take: 3, orderBy: { createdAt: "desc" } });
+  const userId = session?.user?.id ?? null;
+
+  const [popularApps, newApps] = await Promise.all([
+    prisma.appCard.findMany({
+      take: 3,
+      orderBy: { likeCount: "desc" },
+      include: userId ? { likes: { where: { userId }, select: { userId: true } } } : undefined,
+    }),
+    prisma.appCard.findMany({
+      take: 3,
+      orderBy: { createdAt: "desc" },
+      include: userId ? { likes: { where: { userId }, select: { userId: true } } } : undefined,
+    }),
+  ]);
   return (
     <>
       {/* Hero Section */}
@@ -93,16 +107,16 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured Apps Preview */}
+      {/* Popular Apps */}
       <section className="border-t border-border">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="flex items-end justify-between mb-12">
             <div>
               <p className="text-sm font-medium text-accent uppercase tracking-widest mb-2">
-                Featured
+                Popular
               </p>
               <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-4xl">
-                주목할 AI 도구
+                인기 AI 앱
               </h2>
             </div>
             <Link
@@ -115,58 +129,129 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredApps.map((app) => {
+            {popularApps.map((app) => {
               const industryTags: string[] = JSON.parse(app.industryTags);
               const processTags: string[] = JSON.parse(app.processTags);
+              const isLiked = userId ? (app.likes?.length ?? 0) > 0 : false;
               return (
-              <Link
-                key={app.id}
-                href={`/catalog/${app.id}`}
-                className="group rounded-2xl border border-border bg-card p-6 hover:bg-card-hover transition-colors"
-              >
-                <div className="aspect-[4/3] rounded-xl bg-background overflow-hidden mb-4">
-                  <Image
-                    src={app.thumbnail}
-                    alt={app.title}
-                    width={400}
-                    height={300}
-                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {industryTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {processTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <h3 className="text-lg font-bold mb-1 group-hover:text-accent transition-colors">
-                  {app.title}
-                </h3>
-                <p className="text-sm text-muted leading-relaxed line-clamp-2">
-                  {app.description}
-                </p>
-              </Link>
+                <Link
+                  key={app.id}
+                  href={`/catalog/${app.id}`}
+                  className="group rounded-2xl border border-border bg-card p-6 hover:bg-card-hover transition-colors"
+                >
+                  <div className="aspect-[4/3] rounded-xl bg-background overflow-hidden mb-4">
+                    <Image
+                      src={app.thumbnail}
+                      alt={app.title}
+                      width={400}
+                      height={300}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <h3 className="text-lg font-bold group-hover:text-accent transition-colors leading-snug">
+                      {app.title}
+                    </h3>
+                    <LikeButton appId={app.id} initialLiked={isLiked} initialCount={app.likeCount} size="sm" />
+                  </div>
+                  <p className="text-sm text-muted leading-relaxed line-clamp-2 mb-3">
+                    {app.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {industryTags.map((tag) => (
+                      <span key={tag} className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+                        {tag}
+                      </span>
+                    ))}
+                    {processTags.map((tag) => (
+                      <span key={tag} className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
               );
             })}
           </div>
 
           <div className="mt-8 text-center sm:hidden">
+            <Link href="/catalog" className="inline-flex items-center gap-1 text-sm font-medium text-accent">
+              전체 보기
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* New Apps */}
+      <section className="border-t border-border bg-card">
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="text-sm font-medium text-accent uppercase tracking-widest mb-2">
+                New
+              </p>
+              <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-4xl">
+                새로운 AI 앱
+              </h2>
+            </div>
             <Link
               href="/catalog"
-              className="inline-flex items-center gap-1 text-sm font-medium text-accent"
+              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-muted hover:text-foreground transition-colors"
             >
+              전체 보기
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {newApps.map((app) => {
+              const industryTags: string[] = JSON.parse(app.industryTags);
+              const processTags: string[] = JSON.parse(app.processTags);
+              const isLiked = userId ? (app.likes?.length ?? 0) > 0 : false;
+              return (
+                <Link
+                  key={app.id}
+                  href={`/catalog/${app.id}`}
+                  className="group rounded-2xl border border-border bg-background p-6 hover:bg-card-hover transition-colors"
+                >
+                  <div className="aspect-[4/3] rounded-xl bg-card overflow-hidden mb-4">
+                    <Image
+                      src={app.thumbnail}
+                      alt={app.title}
+                      width={400}
+                      height={300}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <h3 className="text-lg font-bold group-hover:text-accent transition-colors leading-snug">
+                      {app.title}
+                    </h3>
+                    <LikeButton appId={app.id} initialLiked={isLiked} initialCount={app.likeCount} size="sm" />
+                  </div>
+                  <p className="text-sm text-muted leading-relaxed line-clamp-2 mb-3">
+                    {app.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {industryTags.map((tag) => (
+                      <span key={tag} className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+                        {tag}
+                      </span>
+                    ))}
+                    {processTags.map((tag) => (
+                      <span key={tag} className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 text-center sm:hidden">
+            <Link href="/catalog" className="inline-flex items-center gap-1 text-sm font-medium text-accent">
               전체 보기
               <ArrowRight className="h-4 w-4" />
             </Link>
