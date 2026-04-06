@@ -20,9 +20,9 @@ interface PostItem {
 const tabs: { type: BoardType | "all"; label: string; icon: React.ReactNode }[] = [
   { type: "all", label: "전체", icon: null },
   { type: "notice", label: "공지사항", icon: <Bell className="h-4 w-4" /> },
+  { type: "article", label: "아티클", icon: <BookOpen className="h-4 w-4" /> },
   { type: "forum", label: "포럼", icon: <MessageSquare className="h-4 w-4" /> },
   { type: "job", label: "구인구직", icon: <Briefcase className="h-4 w-4" /> },
-  { type: "article", label: "아티클", icon: <BookOpen className="h-4 w-4" /> },
 ];
 
 const typeLabel: Record<BoardType, string> = {

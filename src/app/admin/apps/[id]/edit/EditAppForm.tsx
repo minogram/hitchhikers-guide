@@ -13,6 +13,7 @@ interface EditAppFormProps {
     industryTags: string[];
     processTags: string[];
     hasGeminiDemo: boolean;
+    thumbnail: string;
   };
 }
 

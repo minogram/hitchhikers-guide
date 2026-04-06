@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
+import { ArrowLeft, ExternalLink, Sparkles, Pencil } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -16,19 +17,34 @@ export default async function AppDetailPage({ params }: Props) {
     notFound();
   }
 
+  const session = await auth();
+  const role = session?.user?.role;
+  const isPrivileged = role === "admin" || role === "manager";
+
   const industryTags: string[] = JSON.parse(app.industryTags);
   const processTags: string[] = JSON.parse(app.processTags);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
       {/* Back Link */}
-      <Link
-        href="/catalog"
-        className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors mb-8"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        카탈로그로 돌아가기
-      </Link>
+      <div className="flex items-center justify-between mb-8">
+        <Link
+          href="/catalog"
+          className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          카탈로그로 돌아가기
+        </Link>
+        {isPrivileged && (
+          <Link
+            href={`/admin/apps/${app.id}/edit`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-card-hover transition-colors"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            수정
+          </Link>
+        )}
+      </div>
 
       {/* App Header */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-12">

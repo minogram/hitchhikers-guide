@@ -38,7 +38,7 @@ export default async function MyPage() {
         />
         <PasswordSection />
         <ApiKeySection hasApiKey={profile.hasApiKey} />
-        <DeleteAccountSection />
+        {session.user.role !== "admin" && <DeleteAccountSection />}
       </div>
     </div>
   );

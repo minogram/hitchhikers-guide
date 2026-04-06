@@ -9,8 +9,6 @@ import { useTheme } from "@/components/ThemeProvider";
 const navigation = [
   { name: "카탈로그", href: "/catalog" },
   { name: "커뮤니티", href: "/community" },
-  { name: "아티클", href: "/community?type=article" },
-  { name: "구인구직", href: "/community?type=job" },
 ];
 
 export function Header() {
@@ -78,9 +76,11 @@ export function Header() {
               >
                 <UserCircle className="h-4 w-4" />
                 {session.user.name}
-                <span className="inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-                  {session.user.role}
-                </span>
+                {(isAdmin || isManager) && (
+                  <span className="inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                    {session.user.role}
+                  </span>
+                )}
               </Link>
               <button
                 onClick={() => signOut()}
@@ -149,7 +149,7 @@ export function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <UserCircle className="h-4 w-4" />
-                  {session.user.name} ({session.user.role})
+                  {session.user.name}{(isAdmin || isManager) && ` (${session.user.role})`}
                 </Link>
                 <button
                   onClick={() => {

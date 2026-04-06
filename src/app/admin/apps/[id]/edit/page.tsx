@@ -24,6 +24,7 @@ export default async function EditAppPage({ params }: Props) {
     industryTags: JSON.parse(app.industryTags) as string[],
     processTags: JSON.parse(app.processTags) as string[],
     hasGeminiDemo: app.hasGeminiDemo,
+    thumbnail: app.thumbnail,
   };
 
   return (

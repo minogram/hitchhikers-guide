@@ -1,9 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Zap, Users, BookOpen } from "lucide-react";
-import { sampleApps } from "@/lib/data";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  const featuredApps = await prisma.appCard.findMany({ take: 3, orderBy: { createdAt: "desc" } });
   return (
     <>
       {/* Hero Section */}
@@ -32,12 +35,14 @@ export default function Home() {
                 카탈로그 탐색
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link
-                href="/register"
-                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold hover:bg-card-hover transition-colors"
-              >
-                무료 가입
-              </Link>
+              {!session?.user && (
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold hover:bg-card-hover transition-colors"
+                >
+                  무료 가입
+                </Link>
+              )}
             </div>
           </div>
 
@@ -110,7 +115,10 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {sampleApps.slice(0, 3).map((app) => (
+            {featuredApps.map((app) => {
+              const industryTags: string[] = JSON.parse(app.industryTags);
+              const processTags: string[] = JSON.parse(app.processTags);
+              return (
               <Link
                 key={app.id}
                 href={`/catalog/${app.id}`}
@@ -126,7 +134,7 @@ export default function Home() {
                   />
                 </div>
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {app.industryTags.map((tag) => (
+                  {industryTags.map((tag) => (
                     <span
                       key={tag}
                       className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
@@ -134,7 +142,7 @@ export default function Home() {
                       {tag}
                     </span>
                   ))}
-                  {app.processTags.map((tag) => (
+                  {processTags.map((tag) => (
                     <span
                       key={tag}
                       className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted"
@@ -150,7 +158,8 @@ export default function Home() {
                   {app.description}
                 </p>
               </Link>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-8 text-center sm:hidden">

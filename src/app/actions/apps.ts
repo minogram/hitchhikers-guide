@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import * as z from "zod";
+import { writeFile } from "fs/promises";
+import { join } from "path";
+import { randomUUID } from "crypto";
 
 const AppFormSchema = z.object({
   title: z.string().min(1, "앱 이름을 입력해주세요."),
@@ -28,7 +31,15 @@ async function requireAdminOrManager() {
   }
   return session;
 }
-
+async function saveThumbnail(file: File): Promise<string> {
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const filename = `${randomUUID()}.${ext}`;
+  const uploadDir = join(process.cwd(), "public", "uploads", "apps");
+  await writeFile(join(uploadDir, filename), buffer);
+  return `/uploads/apps/${filename}`;
+}
 export async function createApp(
   _prevState: AppFormState | undefined,
   formData: FormData
@@ -55,6 +66,12 @@ export async function createApp(
 
   const data = validatedFields.data;
 
+  const thumbnailFile = formData.get("thumbnail") as File | null;
+  let thumbnailPath: string | undefined;
+  if (thumbnailFile && thumbnailFile.size > 0) {
+    thumbnailPath = await saveThumbnail(thumbnailFile);
+  }
+
   await prisma.appCard.create({
     data: {
       title: data.title,
@@ -65,6 +82,7 @@ export async function createApp(
       processTags: data.processTags,
       hasGeminiDemo: data.hasGeminiDemo ?? false,
       createdBy: session.user.id,
+      ...(thumbnailPath ? { thumbnail: thumbnailPath } : {}),
     },
   });
 
@@ -100,6 +118,12 @@ export async function updateApp(
 
   const data = validatedFields.data;
 
+  const thumbnailFile = formData.get("thumbnail") as File | null;
+  let thumbnailPath: string | undefined;
+  if (thumbnailFile && thumbnailFile.size > 0) {
+    thumbnailPath = await saveThumbnail(thumbnailFile);
+  }
+
   await prisma.appCard.update({
     where: { id: appId },
     data: {
@@ -110,6 +134,7 @@ export async function updateApp(
       industryTags: data.industryTags,
       processTags: data.processTags,
       hasGeminiDemo: data.hasGeminiDemo ?? false,
+      ...(thumbnailPath ? { thumbnail: thumbnailPath } : {}),
     },
   });
 

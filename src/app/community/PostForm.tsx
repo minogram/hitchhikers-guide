@@ -53,19 +53,36 @@ export function PostForm({ action, initialData, isEdit }: PostFormProps) {
           <label htmlFor="type" className="block text-sm font-medium mb-2">
             카테고리
           </label>
-          <select
-            id="type"
-            name="type"
-            defaultValue={initialData?.type ?? "forum"}
-            disabled={isEdit}
-            className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-accent transition-colors disabled:opacity-50"
-          >
-            {availableTypes.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
-            ))}
-          </select>
+          {isEdit ? (
+            <>
+              <input type="hidden" name="type" value={initialData?.type ?? "forum"} />
+              <select
+                id="type"
+                disabled
+                defaultValue={initialData?.type ?? "forum"}
+                className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-accent transition-colors disabled:opacity-50"
+              >
+                {typeOptions.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </>
+          ) : (
+            <select
+              id="type"
+              name="type"
+              defaultValue={initialData?.type ?? "forum"}
+              className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-accent transition-colors"
+            >
+              {availableTypes.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          )}
           {state?.errors?.type && (
             <p className="mt-1 text-xs text-accent">{state.errors.type[0]}</p>
           )}
