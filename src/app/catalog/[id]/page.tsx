@@ -17,7 +17,7 @@ export default async function AppDetailPage({ params }: Props) {
     notFound();
   }
 
-  const session = await auth();
+  const session = await auth().catch(() => null);
   const role = session?.user?.role;
   const isPrivileged = role === "admin" || role === "manager";
 

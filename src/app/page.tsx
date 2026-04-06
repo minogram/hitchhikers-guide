@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function Home() {
-  const session = await auth();
+  const session = await auth().catch(() => null);
   const featuredApps = await prisma.appCard.findMany({ take: 3, orderBy: { createdAt: "desc" } });
   return (
     <>
