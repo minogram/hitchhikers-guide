@@ -26,12 +26,23 @@ interface AppFormProps {
 export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.thumbnail ?? null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>(initialData?.thumbnail ?? "");
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
+    if (!file) return;
+    setPreviewUrl(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.url) setThumbnailUrl(data.url);
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -44,7 +55,7 @@ export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
   }
 
   return (
-    <form action={formAction} encType="multipart/form-data" className="space-y-6">
+    <form action={formAction} className="space-y-6">
       {state?.message && !state.success && (
         <div className="rounded-xl bg-red-500/10 p-4 text-sm text-red-500">
           {state.message}
@@ -69,19 +80,18 @@ export function AppForm({ action, initialData, submitLabel }: AppFormProps) {
           )}
           {previewUrl && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
-              <span className="text-white text-sm font-medium">이미지 변경</span>
+              <span className="text-white text-sm font-medium">{uploading ? "업로드 중..." : "이미지 변경"}</span>
             </div>
           )}
         </div>
         <input
           ref={fileInputRef}
-          id="thumbnail"
-          name="thumbnail"
           type="file"
           accept="image/*"
           className="sr-only"
           onChange={handleFileChange}
         />
+        <input type="hidden" name="thumbnail" value={thumbnailUrl} />
         <p className="mt-1 text-xs text-muted">PNG, JPG, WebP (권장 4:3 비율)</p>
       </div>
 

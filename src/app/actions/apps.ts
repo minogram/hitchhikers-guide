@@ -4,9 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import * as z from "zod";
-import { writeFile } from "fs/promises";
-import { join } from "path";
-import { randomUUID } from "crypto";
 
 const AppFormSchema = z.object({
   title: z.string().min(1, "앱 이름을 입력해주세요."),
@@ -66,11 +63,7 @@ export async function createApp(
 
   const data = validatedFields.data;
 
-  const thumbnailFile = formData.get("thumbnail") as File | null;
-  let thumbnailPath: string | undefined;
-  if (thumbnailFile && thumbnailFile.size > 0) {
-    thumbnailPath = await saveThumbnail(thumbnailFile);
-  }
+  const thumbnailUrl = (formData.get("thumbnail") as string | null)?.trim();
 
   await prisma.appCard.create({
     data: {
@@ -82,7 +75,7 @@ export async function createApp(
       processTags: data.processTags,
       hasGeminiDemo: data.hasGeminiDemo ?? false,
       createdBy: session.user.id,
-      ...(thumbnailPath ? { thumbnail: thumbnailPath } : {}),
+      ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
     },
   });
 
@@ -118,11 +111,7 @@ export async function updateApp(
 
   const data = validatedFields.data;
 
-  const thumbnailFile = formData.get("thumbnail") as File | null;
-  let thumbnailPath: string | undefined;
-  if (thumbnailFile && thumbnailFile.size > 0) {
-    thumbnailPath = await saveThumbnail(thumbnailFile);
-  }
+  const thumbnailUrl = (formData.get("thumbnail") as string | null)?.trim();
 
   await prisma.appCard.update({
     where: { id: appId },
@@ -134,7 +123,7 @@ export async function updateApp(
       industryTags: data.industryTags,
       processTags: data.processTags,
       hasGeminiDemo: data.hasGeminiDemo ?? false,
-      ...(thumbnailPath ? { thumbnail: thumbnailPath } : {}),
+      ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
     },
   });
 
