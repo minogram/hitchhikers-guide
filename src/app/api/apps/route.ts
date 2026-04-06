@@ -22,7 +22,7 @@ export async function GET() {
     processTags: JSON.parse(app.processTags),
     hasGeminiDemo: app.hasGeminiDemo,
     likeCount: app.likeCount,
-    isLiked: userId ? (app.likes?.length ?? 0) > 0 : false,
+    isLiked: userId ? ((app as typeof app & { likes?: { userId: string }[] }).likes?.length ?? 0) > 0 : false,
   }));
 
   return NextResponse.json(formatted);

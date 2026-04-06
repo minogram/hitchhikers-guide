@@ -132,7 +132,7 @@ export default async function Home() {
             {popularApps.map((app) => {
               const industryTags: string[] = JSON.parse(app.industryTags);
               const processTags: string[] = JSON.parse(app.processTags);
-              const isLiked = userId ? (app.likes?.length ?? 0) > 0 : false;
+              const isLiked = userId ? ((app as typeof app & { likes?: { userId: string }[] }).likes?.length ?? 0) > 0 : false;
               return (
                 <Link
                   key={app.id}
@@ -208,7 +208,7 @@ export default async function Home() {
             {newApps.map((app) => {
               const industryTags: string[] = JSON.parse(app.industryTags);
               const processTags: string[] = JSON.parse(app.processTags);
-              const isLiked = userId ? (app.likes?.length ?? 0) > 0 : false;
+              const isLiked = userId ? ((app as typeof app & { likes?: { userId: string }[] }).likes?.length ?? 0) > 0 : false;
               return (
                 <Link
                   key={app.id}

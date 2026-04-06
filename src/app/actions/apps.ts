@@ -28,15 +28,7 @@ async function requireAdminOrManager() {
   }
   return session;
 }
-async function saveThumbnail(file: File): Promise<string> {
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const filename = `${randomUUID()}.${ext}`;
-  const uploadDir = join(process.cwd(), "public", "uploads", "apps");
-  await writeFile(join(uploadDir, filename), buffer);
-  return `/uploads/apps/${filename}`;
-}
+
 export async function createApp(
   _prevState: AppFormState | undefined,
   formData: FormData
