@@ -51,65 +51,212 @@ async function main() {
   });
   console.log(`✅ User: ${user1.email}`);
 
-  // Create sample apps
+  // Create apps
   const apps = [
     {
-      title: "FashionGen AI",
-      description: "AI 기반 패션 디자인 생성 도구. 스타일과 트렌드를 반영한 디자인을 자동으로 생성합니다.",
-      detailDescription: "FashionGen AI는 최신 생성형 AI 기술을 활용하여 패션 디자이너의 창작 과정을 혁신합니다. 트렌드 데이터와 사용자의 스타일 선호도를 분석하여 독창적인 패션 디자인을 제안합니다.",
-      link: "https://example.com/fashiongen",
+      title: "Brading Identity Generator",
+      description: "브랜드의 핵심 정체성을 정의하고 시각적 이미지 보드를 생성하세요",
+      detailDescription: `1) In Put
+- 구조화된 프롬프트 속 옵션 선택 클릭
+- 브랜드 이름 및 설립 연도 직접 작성
+
+2) Out Put & Download
+- 브랜드 소개서
+- 브랜드 이미지 보드 및 이미지 생성 Prompt`,
+      link: "https://buly.kr/74Xg02V",
+      industryTags: JSON.stringify(["Fashion", "Bags", "Shoes", "Beauty"]),
+      processTags: JSON.stringify(["Planning"]),
+      hasGeminiDemo: false,
+      createdBy: admin.id,
+    },
+    {
+      title: "Pictogram Generator",
+      description: "브랜드 로고를 생성합니다.",
+      detailDescription: `1) In Put
+   - 브랜드 네임 Text로 입력
+   - 옵션 선택 1: 럭셔리 브랜드 시그니처 //  모던 미니멀 브랜드마크 // 
+             패션 라이프스타일 아이콘 // 글로벌 코퍼레이트 심볼 // 친환경 지속가능 마크 //  
+             프리미엄 헤리티지 엠블럼 // 다이나믹 스포츠 로고마크 // 
+             아티스틱 크리에이티브 심볼 //  테크 이노베이션 아이콘 // 버서타일  멀티유즈 마크
+   - 옵션 선택 2: Headwear // Eyewear // Top // Outerwear // Bottom // Legwear //
+              Footwear // Bag & Accessories // Accessary // [Enter directly ]
+
+ 2) Out Put & Download
+   - Brand Pictogram Image // Pictogram Image Prompt`,
+      link: "https://buly.kr/Nksj2x",
+      industryTags: JSON.stringify(["Fashion", "Bags", "Shoes", "Beauty"]),
+      processTags: JSON.stringify(["Planning"]),
+      hasGeminiDemo: false,
+      createdBy: admin.id,
+    },
+    {
+      title: "Brand Persona Generator",
+      description: "브랜드 설명에 맞는 페르소나를 생성합니다.",
+      detailDescription: ` 1) In Put
+  (1) 브랜드 소개서 Text로 입력
+
+ 2) Out Put
+  (1) 인구통계학적 특성 (Demographic Characteristics) 
+  (2) 심리적 특성 (Psychological Characteristics)
+  (3) 라이프스타일 패턴 (Lifestyle Patterns)  //  (4) 패션 관련 행동 (Fashion-Related Behavior)
+  (5) 디지털 접점 (Digital Touchpoints)  //  (6) 브랜드 관계 (Brand Relationship)
+  (7) 브랜드 사용자 페르소나 (Brand User Description)
+  (8) 페르소나 이미지 & 이미지 생성 프롬프트 (Persona Image & Generation Prompt)
+
+ 3) Download
+  - Persona Image`,
+      link: "https://buly.kr/FhOo3sZ",
+      industryTags: JSON.stringify(["Fashion", "Bags", "Shoes", "Beauty"]),
+      processTags: JSON.stringify(["Planning"]),
+      hasGeminiDemo: false,
+      createdBy: admin.id,
+    },
+    {
+      title: "Target Persona Generator for Socks",
+      description: "양말을 위한 페르소나 생성",
+      detailDescription: `1) In Put
+   - 브랜드/스토어명 [텍스트]
+   - 옵션: 분석 목적 / 상품 카테고리 / 기능성 초점 / 착용 상황 / 성별 / 연령대 /
+             가격 / 구매 채널 / 페르소나 깊이
+
+ 2) Out Put & Download
+   - 페르소나 프로필
+   - 페르소나 이미지
+   - 구매 여정 분석
+   - 구매 동기 & 장벽
+   - 마케팅 적용 가이드`,
+      link: "https://buly.kr/9iHPmVE",
+      industryTags: JSON.stringify(["Socks"]),
+      processTags: JSON.stringify(["Planning"]),
+      hasGeminiDemo: false,
+      createdBy: admin.id,
+    },
+    {
+      title: "Fashion Mood Board Generator",
+      description: "무드보드를 생성합니다.",
+      detailDescription: `1) In Put
+  (1) 브랜드 소개서 Text로 입력
+  (2) 옵션 년도 // 옵션 시즌 : 선택
+
+ 2) Out Put
+  (1) Main Mood Board Image
+  (2) Keyword Images
+  (3) Core Keywords
+  (4) Generated Image Prompts
+
+ 3) Download
+ - Image
+ - PDF`,
+      link: "https://buly.kr/5fDc9X0",
       industryTags: JSON.stringify(["Fashion"]),
-      processTags: JSON.stringify(["Design"]),
-      hasGeminiDemo: true,
-      createdBy: admin.id,
-    },
-    {
-      title: "BagVision",
-      description: "핸드백 디자인 최적화를 위한 AI 비전 솔루션.",
-      detailDescription: "BagVision은 핸드백 및 가방 카테고리에 특화된 AI 비전 시스템입니다. 디자인 초안에서 최종 제품까지의 과정을 시뮬레이션하고, 시장 반응을 예측합니다.",
-      link: "https://example.com/bagvision",
-      industryTags: JSON.stringify(["Bags"]),
-      processTags: JSON.stringify(["Design", "Planning"]),
+      processTags: JSON.stringify(["Planning"]),
       hasGeminiDemo: false,
       createdBy: admin.id,
     },
     {
-      title: "ShoeForge",
-      description: "3D 신발 프로토타입 생성 AI. 제조 공정까지 자동 설계.",
-      detailDescription: "ShoeForge는 3D 모델링과 AI를 결합하여 신발 프로토타입을 빠르게 생성합니다. 소재 선택부터 생산 공정 최적화까지 토탈 솔루션을 제공합니다.",
-      link: "https://example.com/shoeforge",
-      industryTags: JSON.stringify(["Shoes"]),
-      processTags: JSON.stringify(["Production", "Design"]),
+      title: "Global Trend Forecaster",
+      description: "트랜드 예측 보고서 생성",
+      detailDescription: `1) In Put
+   -  옵션: 타겟 시즌 // 타겟 시장 // 카테고리 // 의류 분류
+
+ 2) Out Put & Download
+   - 메가 트렌드 (MEGA TRENDS)
+   - 실루엣 트렌드 (SILHOUETTE TRENDS)
+   - 컬러 트렌드 (COLOR TRENDS)
+   - 소재 트렌드 (FABRIC TRENDS)
+   - 디테일 트렌드 (DETAIL TRENDS)
+   - 프린트/패턴 트렌드 (PRINT & PATTERN TRENDS)
+   - 스타일링 트렌드 (STYLING TRENDS)
+   - 추가 분석 (ADDITIONAL ANALYSIS)
+   - PDF 다운로드`,
+      link: "https://buly.kr/Cskh2DK",
+      industryTags: JSON.stringify(["Fashion", "Bags", "Shoes", "Beauty"]),
+      processTags: JSON.stringify(["Planning"]),
       hasGeminiDemo: false,
       createdBy: admin.id,
     },
     {
-      title: "BeautyTrend Analyzer",
-      description: "SNS 데이터를 분석하여 뷰티 트렌드를 예측하는 AI 도구.",
-      detailDescription: "BeautyTrend Analyzer는 소셜 미디어, 뷰티 블로그, 전자상거래 데이터를 실시간으로 분석하여 뷰티 트렌드를 예측합니다.",
-      link: "https://example.com/beautytrend",
-      industryTags: JSON.stringify(["Beauty"]),
-      processTags: JSON.stringify(["Planning", "Commerce"]),
+      title: "Competitor Benchmarking Report",
+      description: "벤치마킹 보고서",
+      detailDescription: `1) In Put
+  (1) 직접 입력
+   - 브랜드 소개서 (텍스트 입력 또는 파일 업로드) // 국내외 경쟁브랜드 각각 3개 사
+
+  (2) 옵션[드롭다운]
+   ① 분석 기간: 6개월 / 1년
+   ② 제품 카테고리: 여성복 / 남성복 / 스포츠웨어 / 액세서리 / 전체
+
+ 2) Out Put & Download
+   - 경쟁사별 가격·프로모션·출시 일정 비교표
+   - 상품 Gap 리스트 및 근거
+   - 기회 전략 제안 (액션 플랜 3~5개, 예상 효과·리스크 포함)
+   - txt 파일 다운로드`,
+      link: "https://buly.kr/H6j8ST6",
+      industryTags: JSON.stringify(["Fashion"]),
+      processTags: JSON.stringify(["Planning"]),
       hasGeminiDemo: false,
       createdBy: admin.id,
     },
     {
-      title: "StyleCommerce AI",
-      description: "패션 이커머스를 위한 개인화 추천 엔진.",
-      detailDescription: "StyleCommerce AI는 고객의 취향, 구매 이력, 트렌드 분석을 통합하여 초개인화된 패션 아이템 추천을 제공합니다.",
-      link: "https://example.com/stylecommerce",
-      industryTags: JSON.stringify(["Fashion", "Beauty"]),
-      processTags: JSON.stringify(["Commerce"]),
-      hasGeminiDemo: true,
+      title: "Trend Radar",
+      description: "인스타그램·핀터레스트·패션위크 이미지를 분석해 트렌드 변화를 추적하는 AI 리포트 생성 도구",
+      detailDescription: `인풋
+- 분석 이미지: 인스타그램, 핀터레스트, 패션위크 등에서 수집 업로드 (최대 10개)
+- 옵션[드롭다운]
+  ① 분석 카테고리: Womenswear / Menswear / Kidswear / Accessories
+  ② 비교 기준 시즌: SS 2025 ~ FW 2026 (트렌드 변화 추적 기준점 설정)
+
+아웃풋 & 다운로드
+- JSON 데이터: 자체 데이터베이스 연동, 추가 분석용
+- 시각화 대시보드: 팀 미팅, 기획 회의 프레젠테이션
+- 전략적 인사이트: 다음 시즌 기획 방향 수립
+- HTML 리포트: 클라이언트 보고서, 아카이빙`,
+      link: "https://buly.kr/7mCyoD9",
+      industryTags: JSON.stringify(["Fashion"]),
+      processTags: JSON.stringify(["Planning"]),
+      hasGeminiDemo: false,
       createdBy: admin.id,
     },
     {
-      title: "FabricMind",
-      description: "AI 기반 패브릭 분석 및 소재 추천 시스템.",
-      detailDescription: "FabricMind는 이미지 분석과 물성 데이터를 결합하여 최적의 패브릭을 추천합니다.",
-      link: "https://example.com/fabricmind",
-      industryTags: JSON.stringify(["Fashion", "Bags", "Shoes"]),
-      processTags: JSON.stringify(["Production", "Planning"]),
+      title: "Fashion Season Planning",
+      description: "브랜드 소개서와 시즌 옵션을 입력하면 콘셉트·무드보드·컬러·소재·디자인·상품 구성까지 완성하는 시즌 기획 도구",
+      detailDescription: `인풋
+① 브랜드 소개서: Text
+② 옵션 년도: 선택
+③ 옵션 시즌: 선택
+④ 패션 스타일: 선택 or 직접 입력
+
+아웃풋
+⑤ 콘셉트, ⑥ 무드보드, ⑦ 컬러, ⑧ 소재, ⑨ 디자인, ⑩ 상품 구성
+[기획서, 이미지 보드, 이미지 프롬프트]
+
+다운로드
+- PDF
+- 이미지 보드`,
+      link: "https://buly.kr/Eop19yf",
+      industryTags: JSON.stringify(["Fashion"]),
+      processTags: JSON.stringify(["Planning"]),
+      hasGeminiDemo: false,
+      createdBy: admin.id,
+    },
+    {
+      title: "Season Concept Developer",
+      description: "브랜드 소개서와 시즌·패션 감성 옵션으로 트렌드 탐색부터 최종 컨셉 추천까지 자동 생성하는 ToT 기반 기획 도구",
+      detailDescription: `인풋
+① 브랜드 소개서: 직접 입력
+② 옵션
+  - 년도 [드롭다운]
+  - 시즌 [드롭다운]
+  - 패션 감성 [드롭다운]
+
+아웃풋 & 다운로드
+① 트렌드 탐색 리포트 - 시장동향/트렌드/감성별 분석
+② 컨셉 옵션 카드 3~4개 - 무드보드 이미지 + 핵심 아이디어, 장단점, 실행가능성
+③ 평가 매트릭스 - 4개 기준별 점수 표
+④ 최종 추천 - 선택 근거 및 실행 주의사항`,
+      link: "https://buly.kr/CM0d3p0",
+      industryTags: JSON.stringify(["Fashion"]),
+      processTags: JSON.stringify(["Planning"]),
       hasGeminiDemo: false,
       createdBy: admin.id,
     },
