@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -45,6 +45,53 @@ export function Footer() {
                 <Link href="/community?type=forum" className="hover:text-foreground transition-colors">
                   포럼에서 질문하기
                 </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Partners */}
+          <div>
+            <h3 className="text-sm font-semibold mb-4">파트너</h3>
+            <ul className="space-y-2 text-sm text-muted">
+              <li>
+                <a
+                  href="https://www.instagram.com/stories/openfashion.datarunway"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  OpenFashion DataRunway
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://openfashion.me"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  OpenFashion.me
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://uttu.me"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Uttu.me
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://dito.fashion"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  dito.fashion
+                </a>
               </li>
             </ul>
           </div>

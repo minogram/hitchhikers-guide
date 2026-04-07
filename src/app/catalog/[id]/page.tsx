@@ -60,6 +60,7 @@ export default async function AppDetailPage({ params }: Props) {
             width={600}
             height={450}
             className="h-full w-full object-cover"
+            priority
           />
         </div>
         <div className="flex flex-col justify-center">
