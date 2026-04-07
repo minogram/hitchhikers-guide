@@ -14,11 +14,10 @@ cloudinary.config({
 
 const AppFormSchema = z.object({
   title: z.string().min(1, "앱 이름을 입력해주세요."),
-  description: z.string().min(1, "설명을 입력해주세요."),
+  description: z.string().optional(),
   detailDescription: z.string().optional(),
-  link: z.string().url("유효한 URL을 입력해주세요."),
-  industryTags: z.string().min(1, "산업 태그를 선택해주세요."),
-  processTags: z.string().min(1, "공정 태그를 선택해주세요."),
+  link: z.string().url("유효한 URL을 입력해주세요.").optional().or(z.literal("")),
+  tags: z.string().min(1, "태그를 한 개 이상 선택해주세요."),
   hasGeminiDemo: z.boolean().optional(),
 });
 
@@ -43,16 +42,14 @@ export async function createApp(
   const session = await requireAdminOrManager();
   if (!session) return { message: "권한이 없습니다." };
 
-  const industryTags = JSON.stringify(formData.getAll("industryTagsChecked"));
-  const processTags = JSON.stringify(formData.getAll("processTagsChecked"));
+  const tags = JSON.stringify(formData.getAll("tagsChecked"));
 
   const validatedFields = AppFormSchema.safeParse({
     title: formData.get("title"),
     description: formData.get("description"),
     detailDescription: formData.get("detailDescription") || undefined,
     link: formData.get("link"),
-    industryTags,
-    processTags,
+    tags,
     hasGeminiDemo: formData.get("hasGeminiDemo") === "on",
   });
 
@@ -64,15 +61,17 @@ export async function createApp(
 
   const thumbnailUrl = (formData.get("thumbnail") as string | null)?.trim();
 
+  const isVisible = formData.get("isVisible") === "on";
+
   await prisma.appCard.create({
     data: {
       title: data.title,
-      description: data.description,
+      description: data.description || "",
       detailDescription: data.detailDescription || null,
-      link: data.link,
-      industryTags: data.industryTags,
-      processTags: data.processTags,
+      link: data.link || "",
+      tags: data.tags,
       hasGeminiDemo: data.hasGeminiDemo ?? false,
+      isVisible,
       createdBy: session.user.id,
       ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
     },
@@ -91,16 +90,14 @@ export async function updateApp(
   const session = await requireAdminOrManager();
   if (!session) return { message: "권한이 없습니다." };
 
-  const industryTags = JSON.stringify(formData.getAll("industryTagsChecked"));
-  const processTags = JSON.stringify(formData.getAll("processTagsChecked"));
+  const tags = JSON.stringify(formData.getAll("tagsChecked"));
 
   const validatedFields = AppFormSchema.safeParse({
     title: formData.get("title"),
     description: formData.get("description"),
     detailDescription: formData.get("detailDescription") || undefined,
     link: formData.get("link"),
-    industryTags,
-    processTags,
+    tags,
     hasGeminiDemo: formData.get("hasGeminiDemo") === "on",
   });
 
@@ -126,16 +123,18 @@ export async function updateApp(
     }
   }
 
+  const isVisible = formData.get("isVisible") === "on";
+
   await prisma.appCard.update({
     where: { id: appId },
     data: {
       title: data.title,
-      description: data.description,
+      description: data.description || "",
       detailDescription: data.detailDescription || null,
-      link: data.link,
-      industryTags: data.industryTags,
-      processTags: data.processTags,
+      link: data.link || "",
+      tags: data.tags,
       hasGeminiDemo: data.hasGeminiDemo ?? false,
+      isVisible,
       ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
     },
   });
@@ -173,8 +172,7 @@ export type AdminApp = {
   description: string;
   detailDescription: string | null;
   link: string;
-  industryTags: string;
-  processTags: string;
+  tags: string;
   hasGeminiDemo: boolean;
   isVisible: boolean;
   createdBy: string;
@@ -251,8 +249,7 @@ export async function importAppsFromJson(jsonText: string): Promise<ImportResult
       continue;
     }
 
-    const industryTags = JSON.stringify(Array.isArray(item.industry) ? item.industry : []);
-    const processTags = JSON.stringify(Array.isArray(item.process) ? item.process : []);
+    const tags = JSON.stringify(Array.isArray(item.tags) ? item.tags : [...(Array.isArray(item.industry) ? item.industry : []), ...(Array.isArray(item.process) ? item.process : [])]);
     const link = String(item.url ?? "").trim();
     const description = String(item.short_description ?? "").trim();
     const detailDescription = String(item.description ?? "").trim() || null;
@@ -263,8 +260,7 @@ export async function importAppsFromJson(jsonText: string): Promise<ImportResult
         description,
         detailDescription,
         link,
-        industryTags,
-        processTags,
+        tags,
         hasGeminiDemo: false,
         isVisible: true,
         createdBy: session.user.id,

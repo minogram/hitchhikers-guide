@@ -13,7 +13,7 @@ interface Props {
 export default async function EditAppPage({ params }: Props) {
   await requireRole("admin", "manager");
   const { id } = await params;
-  const [app, { industry, process }] = await Promise.all([getAppById(id), getTagOptions()]);
+  const [app, { tags }] = await Promise.all([getAppById(id), getTagOptions()]);
 
   if (!app) notFound();
 
@@ -22,9 +22,9 @@ export default async function EditAppPage({ params }: Props) {
     description: app.description,
     detailDescription: app.detailDescription,
     link: app.link,
-    industryTags: JSON.parse(app.industryTags) as string[],
-    processTags: JSON.parse(app.processTags) as string[],
+    tags: JSON.parse(app.tags) as string[],
     hasGeminiDemo: app.hasGeminiDemo,
+    isVisible: app.isVisible,
     thumbnail: app.thumbnail,
   };
 
@@ -47,7 +47,7 @@ export default async function EditAppPage({ params }: Props) {
         </p>
       </div>
 
-      <EditAppForm appId={id} initialData={initialData} industryOptions={industry} processOptions={process} />
+      <EditAppForm appId={id} initialData={initialData} tagOptions={tags} />
     </div>
   );
 }

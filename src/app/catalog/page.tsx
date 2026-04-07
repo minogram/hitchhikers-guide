@@ -11,8 +11,7 @@ type CatalogApp = {
   title: string;
   thumbnail: string;
   description: string;
-  industryTags: string[];
-  processTags: string[];
+  tags: string[];
   hasGeminiDemo: boolean;
   likeCount: number;
   isLiked: boolean;
@@ -22,10 +21,8 @@ export default function CatalogPage() {
   const [apps, setApps] = useState<CatalogApp[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
-  const [selectedProcess, setSelectedProcess] = useState<string | null>(null);
-  const [industryFilters, setIndustryFilters] = useState<string[]>([]);
-  const [processFilters, setProcessFilters] = useState<string[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
   const PAGE_SIZE = 12;
@@ -40,8 +37,7 @@ export default function CatalogPage() {
     fetch("/api/tags")
       .then((res) => res.json())
       .then((data) => {
-        setIndustryFilters(data.industry ?? []);
-        setProcessFilters(data.process ?? []);
+        setTagFilters(data.tags ?? []);
       });
   }, []);
 
@@ -50,17 +46,15 @@ export default function CatalogPage() {
       !searchQuery ||
       app.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       app.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesIndustry =
-      !selectedIndustry || app.industryTags.includes(selectedIndustry);
-    const matchesProcess =
-      !selectedProcess || app.processTags.includes(selectedProcess);
-    return matchesSearch && matchesIndustry && matchesProcess;
+    const matchesTag =
+      !selectedTag || app.tags.includes(selectedTag);
+    return matchesSearch && matchesTag;
   });
 
   // 검색/필터 변경 시 표시 개수 초기화
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [searchQuery, selectedIndustry, selectedProcess]);
+  }, [searchQuery, selectedTag]);
 
   const visibleApps = filteredApps.slice(0, visibleCount);
   const hasMore = visibleCount < filteredApps.length;
@@ -96,7 +90,7 @@ export default function CatalogPage() {
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${
-              showFilters || selectedIndustry || selectedProcess
+              showFilters || selectedTag
                 ? "border-accent text-accent bg-accent/5"
                 : "border-border hover:bg-card-hover"
             }`}
@@ -108,50 +102,23 @@ export default function CatalogPage() {
 
         {/* Filter Tags */}
         {showFilters && (
-          <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">
-                Industry
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {industryFilters.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() =>
-                      setSelectedIndustry(selectedIndustry === tag ? null : tag)
-                    }
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                      selectedIndustry === tag
-                        ? "bg-accent text-white"
-                        : "bg-foreground/5 text-muted hover:text-foreground"
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">
-                Process
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {processFilters.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() =>
-                      setSelectedProcess(selectedProcess === tag ? null : tag)
-                    }
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                      selectedProcess === tag
-                        ? "bg-accent text-white"
-                        : "bg-foreground/5 text-muted hover:text-foreground"
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="flex flex-wrap gap-2">
+              {tagFilters.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() =>
+                    setSelectedTag(selectedTag === tag ? null : tag)
+                  }
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                    selectedTag === tag
+                      ? "bg-accent text-white"
+                      : "bg-foreground/5 text-muted hover:text-foreground"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -200,18 +167,10 @@ export default function CatalogPage() {
               {app.description}
             </p>
             <div className="flex flex-wrap gap-2">
-              {app.industryTags.map((tag) => (
+              {app.tags.map((tag) => (
                 <span
                   key={tag}
                   className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
-                >
-                  {tag}
-                </span>
-              ))}
-              {app.processTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted"
                 >
                   {tag}
                 </span>

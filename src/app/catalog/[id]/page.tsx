@@ -27,8 +27,7 @@ export default async function AppDetailPage({ params }: Props) {
     ? !!(await prisma.appLike.findUnique({ where: { userId_appId: { userId, appId: id } } }))
     : false;
 
-  const industryTags: string[] = JSON.parse(app.industryTags);
-  const processTags: string[] = JSON.parse(app.processTags);
+  const tags: string[] = JSON.parse(app.tags);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
@@ -65,18 +64,10 @@ export default async function AppDetailPage({ params }: Props) {
         </div>
         <div className="flex flex-col justify-center">
           <div className="flex flex-wrap gap-2 mb-4">
-            {industryTags.map((tag: string) => (
+            {tags.map((tag: string) => (
               <span
                 key={tag}
                 className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
-              >
-                {tag}
-              </span>
-            ))}
-            {processTags.map((tag: string) => (
-              <span
-                key={tag}
-                className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted"
               >
                 {tag}
               </span>

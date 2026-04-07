@@ -33,8 +33,9 @@ model AppCard {
   description       String
   detailDescription String?
   link              String
-  industryTags      String   // JSON array stored as string
-  processTags       String   // JSON array stored as string
+  industryTags      String   @default("[]") // kept for migration compat
+  processTags       String   @default("[]") // kept for migration compat
+  tags              String   @default("[]") // JSON array: unified tags
   hasGeminiDemo     Boolean  @default(false)
   isVisible         Boolean  @default(true)
   likeCount         Int      @default(0)
@@ -74,7 +75,7 @@ model Comment {
 
 model TagOption {
   id        String   @id @default(cuid())
-  type      String   // industry | process
+  type      String   @default("tag") // tag (formerly industry | process)
   label     String
   createdAt DateTime @default(now())
 

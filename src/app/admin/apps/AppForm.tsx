@@ -3,7 +3,7 @@
 import { useActionState, useState, useRef, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Sparkles, ImagePlus, Plus, ClipboardPaste } from "lucide-react";
+import { Sparkles, ImagePlus, Plus, ClipboardPaste, Eye } from "lucide-react";
 import type { AppFormState } from "@/app/actions/apps";
 import { addTagOption } from "@/app/actions/tags";
 
@@ -14,27 +14,22 @@ interface AppFormProps {
     description: string;
     detailDescription: string | null;
     link: string;
-    industryTags: string[];
-    processTags: string[];
+    tags: string[];
     hasGeminiDemo: boolean;
+    isVisible?: boolean;
     thumbnail?: string;
   };
   submitLabel: string;
   redirectTo?: string;
-  industryOptions: string[];
-  processOptions: string[];
+  tagOptions: string[];
 }
 
-export function AppForm({ action, initialData, submitLabel, redirectTo, industryOptions: initialIndustryOptions, processOptions: initialProcessOptions }: AppFormProps) {
+export function AppForm({ action, initialData, submitLabel, redirectTo, tagOptions: initialTagOptions }: AppFormProps) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(action, undefined);
-  const [industryOptions, setIndustryOptions] = useState<string[]>(initialIndustryOptions);
-  const [processOptions, setProcessOptions] = useState<string[]>(initialProcessOptions);
-  const [selectedIndustryTags, setSelectedIndustryTags] = useState<Set<string>>(
-    new Set(initialData?.industryTags ?? [])
-  );
-  const [selectedProcessTags, setSelectedProcessTags] = useState<Set<string>>(
-    new Set(initialData?.processTags ?? [])
+  const [tagOptions, setTagOptions] = useState<string[]>(initialTagOptions);
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(
+    new Set(initialData?.tags ?? [])
   );
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.thumbnail ?? null);
   const [thumbnailUrl, setThumbnailUrl] = useState<string>(initialData?.thumbnail ?? "");
@@ -43,25 +38,25 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, industry
   const [isDragging, setIsDragging] = useState(false);
   const [pasteError, setPasteError] = useState<string | null>(null);
   const [geminiDemo, setGeminiDemo] = useState(initialData?.hasGeminiDemo ?? false);
+  const [isVisible, setIsVisible] = useState(initialData?.isVisible ?? true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [newIndustryTag, setNewIndustryTag] = useState("");
-  const [newProcessTag, setNewProcessTag] = useState("");
+  const [newTag, setNewTag] = useState("");
   const [addingTagError, setAddingTagError] = useState<string | null>(null);
   const [isAddingTag, startAddingTag] = useTransition();
 
-  async function handleAddTag(type: "industry" | "process", label: string, setter: (v: string) => void, listSetter: (fn: (prev: string[]) => string[]) => void, selectSetter: (fn: (prev: Set<string>) => Set<string>) => void) {
+  async function handleAddTag(label: string) {
     const trimmed = label.trim();
     if (!trimmed) return;
     setAddingTagError(null);
     startAddingTag(async () => {
-      const result = await addTagOption(type, trimmed);
+      const result = await addTagOption(trimmed);
       if (result.error) {
         setAddingTagError(result.error);
       } else {
-        listSetter((prev) => [...prev, trimmed]);
-        selectSetter((prev) => new Set([...prev, trimmed]));
-        setter("");
+        setTagOptions((prev) => [...prev, trimmed]);
+        setSelectedTags((prev) => new Set([...prev, trimmed]));
+        setNewTag("");
       }
     });
   }
@@ -253,7 +248,7 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, industry
 
       <div>
         <label htmlFor="description" className="block text-sm font-medium mb-2">
-          한 줄 설명 *
+          한 줄 설명
         </label>
         <input
           id="description"
@@ -261,11 +256,7 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, industry
           type="text"
           defaultValue={initialData?.description}
           className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-accent transition-colors"
-          required
         />
-        {state?.errors?.description && (
-          <p className="mt-1 text-xs text-red-500">{state.errors.description[0]}</p>
-        )}
       </div>
 
       <div>
@@ -283,7 +274,7 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, industry
 
       <div>
         <label htmlFor="link" className="block text-sm font-medium mb-2">
-          바로가기 URL *
+          바로가기 URL
         </label>
         <input
           id="link"
@@ -292,24 +283,20 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, industry
           defaultValue={initialData?.link}
           placeholder="https://"
           className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-accent transition-colors"
-          required
         />
-        {state?.errors?.link && (
-          <p className="mt-1 text-xs text-red-500">{state.errors.link[0]}</p>
-        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-3">Industry 태그 *</label>
+        <label className="block text-sm font-medium mb-3">태그 *</label>
         <div className="flex flex-wrap gap-2">
-          {industryOptions.map((tag) => (
+          {tagOptions.map((tag) => (
             <label key={tag} className="cursor-pointer">
               <input
                 type="checkbox"
-                name="industryTagsChecked"
+                name="tagsChecked"
                 value={tag}
-                checked={selectedIndustryTags.has(tag)}
-                onChange={(e) => setSelectedIndustryTags((prev) => {
+                checked={selectedTags.has(tag)}
+                onChange={(e) => setSelectedTags((prev) => {
                   const next = new Set(prev);
                   e.target.checked ? next.add(tag) : next.delete(tag);
                   return next;
@@ -325,73 +312,21 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, industry
         <div className="mt-2 flex items-center gap-2">
           <input
             type="text"
-            value={newIndustryTag}
-            onChange={(e) => setNewIndustryTag(e.target.value)}
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-                handleAddTag("industry", newIndustryTag, setNewIndustryTag, setIndustryOptions, setSelectedIndustryTags);
+                handleAddTag(newTag);
               }
             }}
-            placeholder="새 카테고리 입력"
+            placeholder="새 태그 입력"
             className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent transition-colors w-40"
           />
           <button
             type="button"
-            disabled={isAddingTag || !newIndustryTag.trim()}
-            onClick={() => handleAddTag("industry", newIndustryTag, setNewIndustryTag, setIndustryOptions, setSelectedIndustryTags)}
-            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            추가
-          </button>
-        </div>
-        {state?.errors?.industryTags && (
-          <p className="mt-1 text-xs text-red-500">{state.errors.industryTags[0]}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-3">Process 태그 *</label>
-        <div className="flex flex-wrap gap-2">
-          {processOptions.map((tag) => (
-            <label key={tag} className="cursor-pointer">
-              <input
-                type="checkbox"
-                name="processTagsChecked"
-                value={tag}
-                checked={selectedProcessTags.has(tag)}
-                onChange={(e) => setSelectedProcessTags((prev) => {
-                  const next = new Set(prev);
-                  e.target.checked ? next.add(tag) : next.delete(tag);
-                  return next;
-                })}
-                className="peer sr-only"
-              />
-              <span className="inline-block rounded-full px-4 py-1.5 text-sm font-medium border border-border peer-checked:bg-accent peer-checked:text-white peer-checked:border-accent transition-colors">
-                {tag}
-              </span>
-            </label>
-          ))}
-        </div>
-        <div className="mt-2 flex items-center gap-2">
-          <input
-            type="text"
-            value={newProcessTag}
-            onChange={(e) => setNewProcessTag(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddTag("process", newProcessTag, setNewProcessTag, setProcessOptions, setSelectedProcessTags);
-              }
-            }}
-            placeholder="새 카테고리 입력"
-            className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent transition-colors w-40"
-          />
-          <button
-            type="button"
-            disabled={isAddingTag || !newProcessTag.trim()}
-            onClick={() => handleAddTag("process", newProcessTag, setNewProcessTag, setProcessOptions, setSelectedProcessTags)}
+            disabled={isAddingTag || !newTag.trim()}
+            onClick={() => handleAddTag(newTag)}
             className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -401,9 +336,32 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, industry
         {addingTagError && (
           <p className="mt-1 text-xs text-red-500">{addingTagError}</p>
         )}
-        {state?.errors?.processTags && (
-          <p className="mt-1 text-xs text-red-500">{state.errors.processTags[0]}</p>
+        {state?.errors?.tags && (
+          <p className="mt-1 text-xs text-red-500">{state.errors.tags[0]}</p>
         )}
+      </div>
+
+      <div className="flex items-center justify-between rounded-xl border border-border bg-card px-5 py-4">
+        <div className="flex items-center gap-2">
+          <Eye className="h-4 w-4 text-accent" />
+          <span className="text-sm font-medium">카탈로그 노출</span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isVisible}
+          onClick={() => setIsVisible((v) => !v)}
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${
+            isVisible ? "bg-accent" : "bg-border"
+          }`}
+        >
+          <span
+            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+              isVisible ? "translate-x-5" : "translate-x-0"
+            }`}
+          />
+        </button>
+        <input type="hidden" name="isVisible" value={isVisible ? "on" : ""} />
       </div>
 
       <div className="flex items-center justify-between rounded-xl border border-border bg-card px-5 py-4">

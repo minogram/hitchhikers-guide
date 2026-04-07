@@ -29,14 +29,12 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
   const filtered = apps.filter((app) => {
     if (!query) return true;
     const q = query.toLowerCase();
-    const industryTags: string[] = JSON.parse(app.industryTags);
-    const processTags: string[] = JSON.parse(app.processTags);
+    const tags: string[] = JSON.parse(app.tags);
     return (
       app.title.toLowerCase().includes(q) ||
       app.description.toLowerCase().includes(q) ||
       app.author.name.toLowerCase().includes(q) ||
-      industryTags.some((t) => t.toLowerCase().includes(q)) ||
-      processTags.some((t) => t.toLowerCase().includes(q))
+      tags.some((t) => t.toLowerCase().includes(q))
     );
   });
 
@@ -73,8 +71,7 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
           </thead>
           <tbody>
             {filtered.map((app) => {
-              const industryTags: string[] = JSON.parse(app.industryTags);
-              const processTags: string[] = JSON.parse(app.processTags);
+              const tags: string[] = JSON.parse(app.tags);
               return (
                 <tr key={app.id} className={`border-b border-border last:border-0 transition-opacity ${app.isVisible ? "" : "opacity-50"}`}>
                   <td className="px-6 py-4">
@@ -87,18 +84,10 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
-                      {industryTags.map((tag) => (
+                      {tags.map((tag) => (
                         <span
                           key={tag}
                           className="inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                      {processTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="inline-block rounded-full bg-foreground/5 px-2 py-0.5 text-xs text-muted"
                         >
                           {tag}
                         </span>

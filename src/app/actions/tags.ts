@@ -14,14 +14,12 @@ async function requireAdminOrManager() {
 
 export async function getTagOptions() {
   const tags = await prisma.tagOption.findMany({
-    orderBy: [{ type: "asc" }, { createdAt: "asc" }],
+    orderBy: [{ createdAt: "asc" }],
   });
-  const industry = tags.filter((t) => t.type === "industry").map((t) => t.label);
-  const process = tags.filter((t) => t.type === "process").map((t) => t.label);
-  return { industry, process };
+  return { tags: tags.map((t) => t.label) };
 }
 
-export async function addTagOption(type: "industry" | "process", label: string) {
+export async function addTagOption(label: string) {
   const session = await requireAdminOrManager();
   if (!session) return { error: "권한이 없습니다." };
 
@@ -29,7 +27,7 @@ export async function addTagOption(type: "industry" | "process", label: string) 
   if (!trimmed) return { error: "태그 이름을 입력해주세요." };
 
   try {
-    await prisma.tagOption.create({ data: { type, label: trimmed } });
+    await prisma.tagOption.create({ data: { type: "tag", label: trimmed } });
   } catch {
     return { error: "이미 존재하는 태그입니다." };
   }
