@@ -93,6 +93,26 @@ export function Footer() {
                   dito.fashion
                 </a>
               </li>
+              <li>
+                <a
+                  href="https://d3dfashion.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  d3dfashion.com
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://cafe.naver.com/misinggo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  cafe.naver.com/misinggo
+                </a>
+              </li>
             </ul>
           </div>
         </div>
