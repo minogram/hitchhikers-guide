@@ -179,11 +179,15 @@ export type AdminApp = {
   createdAt: Date;
   updatedAt: Date;
   author: { name: string };
+  _count: { likes: number };
 };
 
 export async function getApps(): Promise<AdminApp[]> {
   return prisma.appCard.findMany({
-    include: { author: { select: { name: true } } },
+    include: {
+      author: { select: { name: true } },
+      _count: { select: { likes: true } },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
