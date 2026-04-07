@@ -81,9 +81,9 @@ export default async function AppDetailPage({ params }: Props) {
           </p>
           <div className="flex gap-3 flex-wrap">
             <a
-              href={app.link}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={userId ? app.link : `/login?callbackUrl=/catalog/${app.id}`}
+              target={userId ? "_blank" : "_self"}
+              rel={userId ? "noopener noreferrer" : undefined}
               className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
             >
               바로가기
