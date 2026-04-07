@@ -9,6 +9,7 @@ export type AdminPost = {
   type: string;
   title: string;
   isPinned: boolean;
+  isVisible: boolean;
   authorId: string;
   createdAt: Date;
   author: { name: string };
@@ -27,6 +28,7 @@ export async function getAdminPosts(): Promise<AdminPost[]> {
       type: true,
       title: true,
       isPinned: true,
+      isVisible: true,
       authorId: true,
       createdAt: true,
       author: { select: { name: true } },
@@ -53,6 +55,26 @@ export async function togglePin(postId: string) {
   revalidatePath("/admin/posts");
   revalidatePath("/community");
   return { success: true };
+}
+
+export async function togglePostVisibility(postId: string) {
+  const session = await auth();
+  if (!session?.user || !['admin', 'manager'].includes(session.user.role as string)) {
+    return { error: '권한이 없습니다.' };
+  }
+
+  const post = await prisma.post.findUnique({ where: { id: postId }, select: { isVisible: true } });
+  if (!post) return { error: '게시글을 찾을 수 없습니다.' };
+
+  const updated = await prisma.post.update({
+    where: { id: postId },
+    data: { isVisible: !post.isVisible },
+    select: { isVisible: true },
+  });
+
+  revalidatePath('/admin/posts');
+  revalidatePath('/community');
+  return { isVisible: updated.isVisible };
 }
 
 export async function adminDeletePost(postId: string) {

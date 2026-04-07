@@ -1,0 +1,253 @@
+[
+  {
+    "title": "Branding Identity Generator",
+    "short_description": "브랜드의 핵심 정체성을 정의하고 시각적 이미지 보드를 생성합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Planning"
+    ],
+    "url": "https://buly.kr/74Xg02V",
+    "description": "In Put: 구조화된 프롬프트 속 옵션 선택 클릭, 브랜드 이름 및 설립 연도 직접 작성.\nOut Put & Download: 브랜드 소개서, 브랜드 이미지 보드 및 이미지 생성 Prompt."
+  },
+  {
+    "title": "Target Persona Generator",
+    "short_description": "브랜드 소개서를 바탕으로 타겟 고객의 페르소나 프로필과 이미지를 생성합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Planning",
+      "Marketing"
+    ],
+    "url": "https://buly.kr/9iHPmVE",
+    "description": "In Put: 브랜드/스토어명, 분석 목적, 상품 카테고리 등 옵션 입력.\nOut Put & Download: 페르소나 프로필, 페르소나 이미지, 구매 여정 분석, 마케팅 적용 가이드."
+  },
+  {
+    "title": "Global Trend Forecasting AI",
+    "short_description": "타겟 시즌과 시장에 맞춘 글로벌 패션 메가 트렌드와 스타일링 리포트를 제공합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Planning"
+    ],
+    "url": "https://buly.kr/Cskh2DK",
+    "description": "In Put: 타겟 시즌, 타겟 시장, 카테고리, 의류 분류 선택.\nOut Put & Download: 메가 트렌드, 실루엣, 컬러, 소재 등 트렌드 리포트 PDF 다운로드."
+  },
+  {
+    "title": "Competitor Benchmarking Report",
+    "short_description": "자사 브랜드와 국내외 경쟁 브랜드를 분석하여 기회 전략을 제안합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Planning",
+      "Business Plan"
+    ],
+    "url": "https://buly.kr/H6j8ST6",
+    "description": "In Put: 브랜드 소개서, 국내외 경쟁브랜드 각각 3개사, 분석 기간, 카테고리 입력.\nOut Put & Download: 경쟁사별 비교표, 상품 Gap 리스트, 기회 전략 제안 및 txt 파일 다운로드."
+  },
+  {
+    "title": "Season Concept",
+    "short_description": "브랜드 소개서와 시즌 옵션을 바탕으로 콘셉트, 무드보드 및 상품 기획안을 생성합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Planning"
+    ],
+    "url": "https://buly.kr/CM0d3p0",
+    "description": "In Put: 브랜드 소개서, 옵션 년도, 옵션 시즌, 패션 감성 입력.\nOut Put & Download: 트렌드 탐색 리포트, 컨셉 옵션 카드, 평가 매트릭스, 최종 추천안 제공."
+  },
+  {
+    "title": "Seasonal Fashion Textile Planning",
+    "short_description": "타겟 고객과 브랜드 컨셉에 맞는 시즌별 소재 기획 보고서와 무드보드를 제공합니다.",
+    "industry": [
+      "Fashion",
+      "Textile"
+    ],
+    "process": [
+      "Planning",
+      "Design"
+    ],
+    "url": "https://buly.kr/3u4L86t",
+    "description": "In Put: 시즌 연도, 타겟 고객, 특화 세그먼트, 브랜드 컨셉, 예상 가격대 선택.\nOut Put & Download: 소재 기획 보고서, 소재 기획 요약표, 소재 무드보드."
+  },
+  {
+    "title": "Sock Trend Planner",
+    "short_description": "글로벌 트렌드와 소비자 니즈를 분석하여 양말 컬렉션 테마와 출시 로드맵을 제안합니다.",
+    "industry": [
+      "Socks"
+    ],
+    "process": [
+      "Planning"
+    ],
+    "url": "https://buly.kr/jalkSc",
+    "description": "In Put: Brand Name, 기획 년도/시즌, 타겟 고객, 가격대 등 옵션 선택.\nOut Put & Download: 시즌 트렌드 분석, 컬러 & 패턴 가이드, 컬렉션 테마 제안, 출시 로드맵."
+  },
+  {
+    "title": "Mood Board Design Recommender",
+    "short_description": "업로드한 무드보드 이미지를 바탕으로 디자인 추천서와 생성 프롬프트를 제공합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Design"
+    ],
+    "url": "https://buly.kr/7FSYSVl",
+    "description": "In Put: 무드보드 이미지 업로드, 복종 선택, 시즌 선택.\nOut Put & Download: Design Recommendation Image, 디자인 추천서, Design Recommendation Image Prompt."
+  },
+  {
+    "title": "Design Variation Explorer",
+    "short_description": "레퍼런스 이미지를 바탕으로 다양한 변형 옵션과 기술적 접근을 추천합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Design"
+    ],
+    "url": "https://buly.kr/1n5AZMc",
+    "description": "In Put: 패션 이미지, 옵션 년도/시즌, 패션 감성, 변형 초점, 가격대 선택.\nOut Put & Download: 레퍼런스 분석, 변형 옵션 A~D, 평가 매트릭스, 최종 추천안 제공."
+  },
+  {
+    "title": "Kids & Character Sock Designer",
+    "short_description": "캐릭터 유형과 스타일에 맞춘 아동용/캐릭터 양말 디자인 시안을 생성합니다.",
+    "industry": [
+      "Socks"
+    ],
+    "process": [
+      "Design"
+    ],
+    "url": "https://buly.kr/GP4DRvC",
+    "description": "In Put: 브랜드/스토어명, 캐릭터 유형, 타겟 성별, 제품 옵션 등.\nOut Put & Download: 캐릭터 디자인 가이드, 캐릭터 양말 이미지, 안전 기준 체크리스트 등 다운로드."
+  },
+  {
+    "title": "Bag Flat Sketch Generator",
+    "short_description": "가방 사진이나 스케치를 바탕으로 기술 도면(Technical Flat Sketch)을 자동 생성합니다.",
+    "industry": [
+      "Bags"
+    ],
+    "process": [
+      "Design"
+    ],
+    "url": "https://buly.kr/1xzwJzz",
+    "description": "In Put: 가방 사진/스케치, 스케치 스타일, 선 굵기, 출력 뷰 옵션 선택.\nOut Put & Download: Technical Flat Sketch PNG 다운로드."
+  },
+  {
+    "title": "Pattern Making Advisor",
+    "short_description": "의상 이미지를 분석하여 실제 패턴 제작에 필요한 구조화된 가이드를 제공합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Production"
+    ],
+    "url": "https://buly.kr/6Bxt6DI",
+    "description": "In Put: 상품 이미지 업로드.\nOut Put & Download: 연쇄(Chaining) 가상 착용 기능, 구조화된 패턴 제작 가이드 텍스트 PDF 다운로드."
+  },
+  {
+    "title": "Fabric Yield Calculator",
+    "short_description": "어패럴 소잉 패턴 이미지를 바탕으로 원단 소요량(요척)을 자동 계산합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Production"
+    ],
+    "url": "https://buly.kr/GktXT83",
+    "description": "In Put: 어패럴 소잉 패턴 이미지, 원단 폭 선택.\nOut Put & Download: 요척 산출 결과(NET/GROSS), 산출 근거 및 배치 시뮬레이션 가이드."
+  },
+  {
+    "title": "Fashion BOM Generator",
+    "short_description": "의류 이미지를 분석하여 제품 기본 정보와 원부자재 명세서(BOM)를 생성합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Production"
+    ],
+    "url": "https://buly.kr/EI4kDol",
+    "description": "In Put: 패션 이미지, 원부자재 파일 및 사이트 주소 첨부.\nOut Put & Download: BOM 리포트 생성 및 PDF 다운로드."
+  },
+  {
+    "title": "AI Fashion Try-On",
+    "short_description": "다양한 패션 상품 이미지를 모델 이미지에 가상으로 착용시켜 줍니다.",
+    "industry": [
+      "Fashion",
+      "Headwear",
+      "Eyewear",
+      "Shoes"
+    ],
+    "process": [
+      "Lookbook"
+    ],
+    "url": "https://buly.kr/CskgNJB",
+    "description": "In Put: 모델 Image, 상품 이미지 및 카테고리 선택.\nOut Put & Download: 연쇄 가상 착용 기능 지원, Try on 이미지 다운로드."
+  },
+  {
+    "title": "Sock Collection Naming Studio",
+    "short_description": "브랜드명과 상품 유형을 기반으로 네이밍 제안 및 패키지 목업 이미지를 생성합니다.",
+    "industry": [
+      "Socks"
+    ],
+    "process": [
+      "Marketing",
+      "Planning"
+    ],
+    "url": "https://buly.kr/FAeuCk5",
+    "description": "In Put: Brand Name, 상품 카테고리, 네이밍 톤 등 옵션 선택.\nOut Put & Download: 메인 네이밍 제안, 네이밍 검증, 패키지 & 목업, 적용 프리뷰."
+  },
+  {
+    "title": "SNS Content Calendar",
+    "short_description": "브랜드 정보와 콘텐츠 선호도에 맞춰 월간 SNS 콘텐츠 캘린더와 포스팅 전략을 기획합니다.",
+    "industry": [
+      "Fashion"
+    ],
+    "process": [
+      "Marketing"
+    ],
+    "url": "https://buly.kr/4xYy0S9",
+    "description": "In Put: 브랜드/스토어명, SNS 운영 단계, 주력 상품군, 캘린더 기간 옵션 입력.\nOut Put & Download: 콘텐츠 캘린더, 해시태그 전략, 아이디어 뱅크 제안."
+  },
+  {
+    "title": "VMD Image Generator",
+    "short_description": "옵션 선택만으로 오프라인 매장의 다채로운 VMD(Visual Merchandising) 이미지를 생성합니다.",
+    "industry": [
+      "Fashion",
+      "Interior"
+    ],
+    "process": [
+      "VMD"
+    ],
+    "url": "https://buly.kr/DPUxK8N",
+    "description": "In Put: 프롬프트 빌더에서 브랜드 컨셉, 공간 규모, 시즌/이벤트 등 옵션 선택.\nOut Put & Download: AI-Generative VMD Image, 활용 프롬프트 참조 및 다운로드."
+  },
+  {
+    "title": "AI 사업계획서 생성기",
+    "short_description": "회사소개서와 과제 유형을 기반으로 한국 정부 지원사업 규격의 사업계획서를 자동 작성합니다.",
+    "industry": [
+      "Fashion",
+      "Technology"
+    ],
+    "process": [
+      "Business Plan"
+    ],
+    "url": "https://buly.kr/BeLNWCF",
+    "description": "In Put: 회사소개서, 참고 자료 파일, 과제 유형 및 수행 기간 등 옵션 설정.\nOut Put & Download: 최적화 사업계획서 제안안 및 PDF 다운로드."
+  },
+  {
+    "title": "Dancheong Pattern Generator",
+    "short_description": "전통 단청 문양과 색상을 조합하여 가구 및 공간 디자인에 적용할 수 있는 패턴을 생성합니다.",
+    "industry": [
+      "Interior",
+      "Furniture"
+    ],
+    "process": [
+      "Design"
+    ],
+    "url": "https://buly.kr/CWva3Cv",
+    "description": "In Put: 프로젝트명, 문양 유형, 오방색 기반 주색상/보조색상, 배경 재질 등 옵션 설정.\nOut Put & Download: 단청 패턴 이미지, Color Palette 가이드, Design Rationale 등 TXT 및 이미지 다운로드."
+  }
+]

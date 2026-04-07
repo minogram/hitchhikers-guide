@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Search, Pin, Trash2 } from "lucide-react";
-import { togglePin, adminDeletePost } from "@/app/actions/admin-posts";
+import { Search, Pin, Trash2, Eye, EyeOff, Pencil } from "lucide-react";
+import { togglePin, togglePostVisibility, adminDeletePost } from "@/app/actions/admin-posts";
 import type { AdminPost } from "@/app/actions/admin-posts";
 
 const typeLabel: Record<string, string> = {
@@ -20,9 +20,11 @@ const typeColor: Record<string, string> = {
   article: "bg-purple-500/10 text-purple-500",
 };
 
-export function AdminPostList({ posts }: { posts: AdminPost[] }) {
+export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [posts, setPosts] = useState<AdminPost[]>(initialPosts);
+  const [togglingVisibilityId, setTogglingVisibilityId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const filtered = posts.filter((post) => {
@@ -39,7 +41,17 @@ export function AdminPostList({ posts }: { posts: AdminPost[] }) {
   function handleTogglePin(postId: string) {
     startTransition(async () => {
       await togglePin(postId);
+      setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, isPinned: !p.isPinned } : p));
     });
+  }
+
+  async function handleToggleVisibility(postId: string) {
+    setTogglingVisibilityId(postId);
+    const result = await togglePostVisibility(postId);
+    if (result.isVisible !== undefined) {
+      setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, isVisible: result.isVisible! } : p));
+    }
+    setTogglingVisibilityId(null);
   }
 
   function handleDelete(postId: string, title: string) {
@@ -86,14 +98,14 @@ export function AdminPostList({ posts }: { posts: AdminPost[] }) {
               <th className="text-left px-6 py-3 font-medium text-muted">카테고리</th>
               <th className="text-left px-6 py-3 font-medium text-muted">제목</th>
               <th className="text-left px-6 py-3 font-medium text-muted">작성자</th>
-              <th className="text-left px-6 py-3 font-medium text-muted">댓글</th>
               <th className="text-left px-6 py-3 font-medium text-muted">작성일</th>
+              <th className="text-left px-6 py-3 font-medium text-muted">댓글</th>
               <th className="text-left px-6 py-3 font-medium text-muted">작업</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((post) => (
-              <tr key={post.id} className="border-b border-border last:border-0">
+              <tr key={post.id} className={`border-b border-border last:border-0 transition-opacity ${post.isVisible ? '' : 'opacity-50'}`}>
                 <td className="px-6 py-4">
                   <span
                     className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -113,38 +125,50 @@ export function AdminPostList({ posts }: { posts: AdminPost[] }) {
                   </Link>
                 </td>
                 <td className="px-6 py-4 text-muted">{post.author.name}</td>
-                <td className="px-6 py-4 text-muted">{post._count.comments}</td>
                 <td className="px-6 py-4 text-muted">
-                  {new Date(post.createdAt).toLocaleDateString("ko-KR")}
+                  {new Date(post.createdAt).toLocaleDateString("en-CA")}
                 </td>
+                <td className="px-6 py-4 text-muted">{post._count.comments}</td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleToggleVisibility(post.id)}
+                      disabled={togglingVisibilityId === post.id}
+                      title={post.isVisible ? '숨기기' : '노출하기'}
+                      className={`p-1.5 rounded-lg transition-colors disabled:opacity-40 ${
+                        post.isVisible
+                          ? 'text-green-600 hover:bg-green-500/10'
+                          : 'text-muted hover:bg-muted/10'
+                      }`}
+                    >
+                      {post.isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </button>
                     <button
                       onClick={() => handleTogglePin(post.id)}
                       disabled={isPending}
-                      className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs transition-colors disabled:opacity-50 ${
-                        post.isPinned
-                          ? "border-accent/30 text-accent hover:bg-accent/10"
-                          : "border-border text-muted hover:text-foreground hover:bg-card-hover"
-                      }`}
                       title={post.isPinned ? "고정 해제" : "고정"}
+                      className={`p-1.5 rounded-lg transition-colors disabled:opacity-50 ${
+                        post.isPinned
+                          ? "text-accent hover:bg-accent/10"
+                          : "text-muted hover:text-foreground hover:bg-card-hover"
+                      }`}
                     >
-                      <Pin className="h-3 w-3" />
-                      {post.isPinned ? "해제" : "고정"}
+                      <Pin className="h-4 w-4" />
                     </button>
                     <Link
                       href={`/community/${post.id}/edit`}
-                      className="rounded-lg border border-border px-2.5 py-1 text-xs text-muted hover:text-foreground hover:bg-card-hover transition-colors"
+                      title="수정"
+                      className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-accent/10 transition-colors"
                     >
-                      수정
+                      <Pencil className="h-4 w-4" />
                     </Link>
                     <button
                       onClick={() => handleDelete(post.id, post.title)}
                       disabled={isPending}
-                      className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 text-red-500 px-2.5 py-1 text-xs hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                      title="삭제"
+                      className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
                     >
-                      <Trash2 className="h-3 w-3" />
-                      삭제
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </td>

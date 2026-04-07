@@ -112,6 +112,20 @@ export async function updateApp(
 
   const thumbnailUrl = (formData.get("thumbnail") as string | null)?.trim();
 
+  // 썸네일이 변경된 경우 기존 Cloudinary 이미지 삭제
+  if (thumbnailUrl) {
+    const existing = await prisma.appCard.findUnique({
+      where: { id: appId },
+      select: { thumbnail: true },
+    });
+    if (existing?.thumbnail && existing.thumbnail !== thumbnailUrl) {
+      const match = existing.thumbnail.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
+      if (match) {
+        await cloudinary.uploader.destroy(match[1]).catch(() => null);
+      }
+    }
+  }
+
   await prisma.appCard.update({
     where: { id: appId },
     data: {
@@ -162,6 +176,7 @@ export type AdminApp = {
   industryTags: string;
   processTags: string;
   hasGeminiDemo: boolean;
+  isVisible: boolean;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
@@ -180,4 +195,87 @@ export async function getAppById(id: string) {
     where: { id },
     include: { author: { select: { name: true } } },
   });
+}
+
+export async function toggleAppVisibility(appId: string): Promise<{ error?: string; isVisible?: boolean }> {
+  const session = await requireAdminOrManager();
+  if (!session) return { error: "권한이 없습니다." };
+
+  const app = await prisma.appCard.findUnique({ where: { id: appId }, select: { isVisible: true } });
+  if (!app) return { error: "앱을 찾을 수 없습니다." };
+
+  const updated = await prisma.appCard.update({
+    where: { id: appId },
+    data: { isVisible: !app.isVisible },
+    select: { isVisible: true },
+  });
+
+  revalidatePath("/catalog");
+  revalidatePath("/admin/apps");
+  return { isVisible: updated.isVisible };
+}
+
+export type ImportResult = {
+  error?: string;
+  created?: number;
+  skipped?: number;
+  skippedTitles?: string[];
+};
+
+export async function importAppsFromJson(jsonText: string): Promise<ImportResult> {
+  const session = await requireAdminOrManager();
+  if (!session) return { error: "권한이 없습니다." };
+
+  let rawData: unknown;
+  try {
+    rawData = JSON.parse(jsonText);
+  } catch {
+    return { error: "JSON 형식이 올바르지 않습니다." };
+  }
+
+  if (!Array.isArray(rawData)) return { error: "apps.json 형식이 올바르지 않습니다." };
+
+  const existingTitles = new Set(
+    (await prisma.appCard.findMany({ select: { title: true } })).map((a) => a.title)
+  );
+
+  let created = 0;
+  const skippedTitles: string[] = [];
+
+  for (const item of rawData) {
+    const title = String(item.title ?? "").trim();
+    if (!title) continue;
+
+    if (existingTitles.has(title)) {
+      skippedTitles.push(title);
+      continue;
+    }
+
+    const industryTags = JSON.stringify(Array.isArray(item.industry) ? item.industry : []);
+    const processTags = JSON.stringify(Array.isArray(item.process) ? item.process : []);
+    const link = String(item.url ?? "").trim();
+    const description = String(item.short_description ?? "").trim();
+    const detailDescription = String(item.description ?? "").trim() || null;
+
+    await prisma.appCard.create({
+      data: {
+        title,
+        description,
+        detailDescription,
+        link,
+        industryTags,
+        processTags,
+        hasGeminiDemo: false,
+        isVisible: true,
+        createdBy: session.user.id,
+      },
+    });
+
+    existingTitles.add(title);
+    created++;
+  }
+
+  revalidatePath("/catalog");
+  revalidatePath("/admin/apps");
+  return { created, skipped: skippedTitles.length, skippedTitles };
 }

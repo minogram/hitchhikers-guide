@@ -27,6 +27,8 @@ export default function CatalogPage() {
   const [industryFilters, setIndustryFilters] = useState<string[]>([]);
   const [processFilters, setProcessFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
+  const PAGE_SIZE = 12;
 
   useEffect(() => {
     fetch("/api/apps")
@@ -54,6 +56,14 @@ export default function CatalogPage() {
       !selectedProcess || app.processTags.includes(selectedProcess);
     return matchesSearch && matchesIndustry && matchesProcess;
   });
+
+  // 검색/필터 변경 시 표시 개수 초기화
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchQuery, selectedIndustry, selectedProcess]);
+
+  const visibleApps = filteredApps.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredApps.length;
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
@@ -149,12 +159,12 @@ export default function CatalogPage() {
 
       {/* Results Count */}
       <p className="mb-6 text-sm text-muted">
-        {loading ? "로딩 중..." : `${filteredApps.length}개의 앱`}
+        {loading ? "로딩 중..." : `전체 ${filteredApps.length}개 중 ${visibleApps.length}개 표시`}
       </p>
 
       {/* App Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredApps.map((app) => (
+        {visibleApps.map((app) => (
           <Link
             key={app.id}
             href={`/catalog/${app.id}`}
@@ -211,9 +221,20 @@ export default function CatalogPage() {
         ))}
       </div>
 
-      {filteredApps.length === 0 && (
+      {filteredApps.length === 0 && !loading && (
         <div className="text-center py-20">
           <p className="text-muted">검색 결과가 없습니다.</p>
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="mt-10 flex justify-center">
+          <button
+            onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            className="rounded-full border border-border bg-card px-8 py-3 text-sm font-medium hover:border-accent hover:text-accent transition-colors"
+          >
+            더보기 ({filteredApps.length - visibleCount}개 남음)
+          </button>
         </div>
       )}
     </div>

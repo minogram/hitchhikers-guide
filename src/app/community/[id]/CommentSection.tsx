@@ -106,7 +106,7 @@ export function CommentSection({
                   </span>
                   <span className="inline-flex items-center gap-1 text-xs text-muted">
                     <Clock className="h-3 w-3" />
-                    {new Date(comment.createdAt).toLocaleDateString("ko-KR")}
+                    {new Date(comment.createdAt).toLocaleDateString("en-CA")}
                   </span>
                 </div>
                 {canDelete && (

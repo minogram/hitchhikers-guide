@@ -36,6 +36,7 @@ model AppCard {
   industryTags      String   // JSON array stored as string
   processTags       String   // JSON array stored as string
   hasGeminiDemo     Boolean  @default(false)
+  isVisible         Boolean  @default(true)
   likeCount         Int      @default(0)
   createdBy         String
   createdAt         DateTime @default(now())
@@ -51,6 +52,7 @@ model Post {
   title     String
   content   String
   isPinned  Boolean  @default(false)
+  isVisible Boolean  @default(true)
   authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

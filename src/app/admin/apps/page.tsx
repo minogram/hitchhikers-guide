@@ -3,6 +3,7 @@ import { getApps } from "@/app/actions/apps";
 import Link from "next/link";
 import { ArrowLeft, AppWindow, Plus } from "lucide-react";
 import { AdminAppList } from "./AdminAppList";
+import { ImportAppsButton } from "./ImportAppsButton";
 
 export default async function AdminAppsPage() {
   await requireRole("admin", "manager");
@@ -28,13 +29,16 @@ export default async function AdminAppsPage() {
           </div>
           <p className="text-muted">총 {apps.length}개의 앱</p>
         </div>
-        <Link
-          href="/admin/apps/new"
-          className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
-        >
-          <Plus className="h-4 w-4" />
-          새 앱 등록
-        </Link>
+        <div className="flex items-center gap-3">
+          <ImportAppsButton />
+          <Link
+            href="/admin/apps/new"
+            className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+          >
+            <Plus className="h-4 w-4" />
+            새 앱 등록
+          </Link>
+        </div>
       </div>
 
       <AdminAppList apps={apps} />

@@ -27,7 +27,7 @@ export default async function MyPage() {
           마이페이지
         </h1>
         <p className="mt-2 text-sm text-muted">
-          가입일: {profile.createdAt.toLocaleDateString("ko-KR")}
+          가입일: {profile.createdAt.toLocaleDateString("en-CA")}
         </p>
       </div>
 

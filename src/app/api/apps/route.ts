@@ -7,6 +7,7 @@ export async function GET() {
   const userId = session?.user?.id ?? null;
 
   const apps = await prisma.appCard.findMany({
+    where: { isVisible: true },
     orderBy: { createdAt: "desc" },
     include: userId
       ? { likes: { where: { userId }, select: { userId: true } } }

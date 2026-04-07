@@ -37,8 +37,13 @@ export default async function PostDetailPage({ params }: Props) {
   const session = await auth();
   const currentUserId = session?.user?.id;
   const role = (session?.user?.role as string) ?? "";
-  const isOwner = currentUserId === post.authorId;
   const isPrivileged = role === "admin" || role === "manager";
+
+  if (!post.isVisible && !isPrivileged) {
+    notFound();
+  }
+
+  const isOwner = currentUserId === post.authorId;
   const canModify = isOwner || isPrivileged;
 
   return (
@@ -66,7 +71,7 @@ export default async function PostDetailPage({ params }: Props) {
             </span>
             <span className="inline-flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              {post.createdAt.toLocaleDateString("ko-KR")}
+              {post.createdAt.toLocaleDateString("en-CA")}
             </span>
             <span className="inline-flex items-center gap-1">
               <MessageCircle className="h-4 w-4" />

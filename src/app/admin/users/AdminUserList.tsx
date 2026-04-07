@@ -60,8 +60,8 @@ export function AdminUserList({ users }: { users: AdminUser[] }) {
             <tr className="border-b border-border bg-card-hover">
               <th className="text-left px-6 py-3 font-medium text-muted">이름</th>
               <th className="text-left px-6 py-3 font-medium text-muted">이메일</th>
-              <th className="text-left px-6 py-3 font-medium text-muted">등급</th>
               <th className="text-left px-6 py-3 font-medium text-muted">가입일</th>
+              <th className="text-left px-6 py-3 font-medium text-muted">등급</th>
               <th className="text-left px-6 py-3 font-medium text-muted">작업</th>
             </tr>
           </thead>
@@ -70,40 +70,31 @@ export function AdminUserList({ users }: { users: AdminUser[] }) {
               <tr key={user.id} className="border-b border-border last:border-0">
                 <td className="px-6 py-4 font-medium">{user.name}</td>
                 <td className="px-6 py-4 text-muted">{user.email}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      user.role === "admin"
-                        ? "bg-red-500/10 text-red-500"
-                        : user.role === "manager"
-                        ? "bg-purple-500/10 text-purple-500"
-                        : "bg-foreground/5 text-muted"
-                    }`}
-                  >
-                    {user.role}
-                  </span>
-                </td>
                 <td className="px-6 py-4 text-muted">
-                  {new Date(user.createdAt).toLocaleDateString("ko-KR")}
+                  {new Date(user.createdAt).toLocaleDateString("en-CA")}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    {user.role !== "admin" ? (
-                      <>
-                        <UserRoleSelect userId={user.id} currentRole={user.role} />
-                        <button
-                          onClick={() => handleDelete(user)}
-                          disabled={isPending}
-                          className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-                          title="사용자 삭제"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </>
-                    ) : (
-                      <span className="text-xs text-muted">—</span>
-                    )}
-                  </div>
+                  {user.role === "admin" ? (
+                    <span className="inline-block rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-500">
+                      admin
+                    </span>
+                  ) : (
+                    <UserRoleSelect userId={user.id} currentRole={user.role} />
+                  )}
+                </td>
+                <td className="px-6 py-4">
+                  {user.role !== "admin" ? (
+                    <button
+                      onClick={() => handleDelete(user)}
+                      disabled={isPending}
+                      className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                      title="사용자 삭제"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <span className="text-xs text-muted">—</span>
+                  )}
                 </td>
               </tr>
             ))}

@@ -1,13 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Search, Sparkles } from "lucide-react";
+import { Search, Sparkles, Eye, EyeOff, Pencil } from "lucide-react";
 import { DeleteAppButton } from "./DeleteAppButton";
+import { toggleAppVisibility } from "@/app/actions/apps";
 import type { AdminApp } from "@/app/actions/apps";
 
-export function AdminAppList({ apps }: { apps: AdminApp[] }) {
+export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
   const [query, setQuery] = useState("");
+  const [apps, setApps] = useState<AdminApp[]>(initialApps);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  async function handleToggleVisibility(appId: string) {
+    setTogglingId(appId);
+    startTransition(async () => {
+      const result = await toggleAppVisibility(appId);
+      if (result.isVisible !== undefined) {
+        setApps((prev) =>
+          prev.map((a) => (a.id === appId ? { ...a, isVisible: result.isVisible! } : a))
+        );
+      }
+      setTogglingId(null);
+    });
+  }
 
   const filtered = apps.filter((app) => {
     if (!query) return true;
@@ -59,7 +76,7 @@ export function AdminAppList({ apps }: { apps: AdminApp[] }) {
               const industryTags: string[] = JSON.parse(app.industryTags);
               const processTags: string[] = JSON.parse(app.processTags);
               return (
-                <tr key={app.id} className="border-b border-border last:border-0">
+                <tr key={app.id} className={`border-b border-border last:border-0 transition-opacity ${app.isVisible ? "" : "opacity-50"}`}>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{app.title}</span>
@@ -89,16 +106,29 @@ export function AdminAppList({ apps }: { apps: AdminApp[] }) {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-muted">{app.author.name}</td>
-                  <td className="px-6 py-4 text-muted">
-                    {new Date(app.createdAt).toLocaleDateString("ko-KR")}
+                  <td className="px-6 py-4 text-muted whitespace-nowrap">
+                    {new Date(app.createdAt).toLocaleDateString("en-CA")}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleToggleVisibility(app.id)}
+                        disabled={togglingId === app.id}
+                        title={app.isVisible ? "숨기기" : "노출하기"}
+                        className={`p-1.5 rounded-lg transition-colors disabled:opacity-40 ${
+                          app.isVisible
+                            ? "text-green-600 hover:bg-green-500/10"
+                            : "text-muted hover:bg-muted/10"
+                        }`}
+                      >
+                        {app.isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      </button>
                       <Link
                         href={`/admin/apps/${app.id}/edit`}
-                        className="text-xs text-accent hover:underline"
+                        title="수정"
+                        className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-accent/10 transition-colors"
                       >
-                        수정
+                        <Pencil className="h-4 w-4" />
                       </Link>
                       <DeleteAppButton appId={app.id} appTitle={app.title} />
                     </div>

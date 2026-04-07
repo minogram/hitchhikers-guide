@@ -136,7 +136,7 @@ export default async function AdminPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-muted">
-                    {new Date(user.createdAt).toLocaleDateString("ko-KR")}
+                    {new Date(user.createdAt).toLocaleDateString("en-CA")}
                   </td>
                 </tr>
               ))}

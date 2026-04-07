@@ -165,7 +165,7 @@ export default function CommunityPage() {
                   <span>{post.authorName}</span>
                   <span className="inline-flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    {new Date(post.createdAt).toLocaleDateString("ko-KR")}
+                    {new Date(post.createdAt).toLocaleDateString("en-CA")}
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <MessageCircle className="h-3 w-3" />

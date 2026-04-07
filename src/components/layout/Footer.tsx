@@ -51,7 +51,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-border text-center text-xs text-muted">
-          © 2025 Hitchhiker&apos;s Guide to Fashion AI. All rights reserved.
+          © 2026 AI Literacy Lab. All rights reserved.
         </div>
       </div>
     </footer>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { Trash2 } from "lucide-react";
 import { deleteApp } from "@/app/actions/apps";
 
 export function DeleteAppButton({
@@ -24,9 +25,10 @@ export function DeleteAppButton({
     <button
       onClick={handleDelete}
       disabled={isPending}
-      className="text-xs text-red-500 hover:underline disabled:opacity-50"
+      title="삭제"
+      className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
     >
-      {isPending ? "삭제 중..." : "삭제"}
+      <Trash2 className="h-4 w-4" />
     </button>
   );
 }
