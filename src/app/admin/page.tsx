@@ -25,14 +25,15 @@ export default async function AdminPage() {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-12">
         {[
-          { label: "전체 사용자", value: stats?.userCount ?? 0, icon: Users },
-          { label: "등록된 앱", value: stats?.appCount ?? 0, icon: AppWindow },
-          { label: "게시글", value: stats?.postCount ?? 0, icon: FileText },
-          { label: "매니저", value: stats?.managerCount ?? 0, icon: Shield },
+          { label: "전체 사용자", value: stats?.userCount ?? 0, icon: Users, href: "/admin/users" },
+          { label: "등록된 앱", value: stats?.appCount ?? 0, icon: AppWindow, href: "/admin/apps" },
+          { label: "게시글", value: stats?.postCount ?? 0, icon: FileText, href: "/admin/posts" },
+          { label: "매니저", value: stats?.managerCount ?? 0, icon: Shield, href: "/admin/users" },
         ].map((stat) => (
-          <div
+          <Link
             key={stat.label}
-            className="rounded-2xl border border-border bg-card p-6"
+            href={stat.href}
+            className="rounded-2xl border border-border bg-card p-6 hover:bg-card-hover transition-colors"
           >
             <div className="flex items-center gap-3 mb-3">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
@@ -41,7 +42,7 @@ export default async function AdminPage() {
             </div>
             <p className="text-2xl font-bold">{stat.value}</p>
             <p className="text-sm text-muted">{stat.label}</p>
-          </div>
+          </Link>
         ))}
       </div>
 
