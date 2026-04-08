@@ -1,4 +1,5 @@
-import { BookOpen, GraduationCap, Lightbulb, Target, Users, Sparkles, Brain, Palette } from "lucide-react";
+import Image from "next/image";
+import { BookOpen, GraduationCap, Lightbulb, Target, Sparkles, Brain, Palette } from "lucide-react";
 
 export default function AboutPage() {
   return (
@@ -43,9 +44,13 @@ export default function AboutPage() {
           <div className="p-8 sm:p-12">
             <div className="flex flex-col sm:flex-row gap-8">
               <div className="shrink-0 flex justify-center">
-                <div className="h-36 w-36 rounded-2xl bg-accent/10 flex items-center justify-center">
-                  <Users className="h-16 w-16 text-accent/40" />
-                </div>
+                <Image
+                  src="/shin.avif"
+                  alt="신용남 교수"
+                  width={144}
+                  height={144}
+                  className="h-36 w-36 rounded-2xl object-cover"
+                />
               </div>
               <div className="flex-1">
                 <h3 className="font-serif text-2xl font-bold mb-1">PhD Shin Yong Nam · 신용남</h3>
