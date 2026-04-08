@@ -17,9 +17,6 @@ export function Footer() {
               <br />
               패션과 AI의 교차점에서 새로운 가치를 창조합니다.
             </p>
-            <p className="mt-4 text-xs text-muted">
-              © 2026 AI Literacy Lab. All rights reserved.
-            </p>
           </div>
 
           {/* Links */}
@@ -109,6 +106,15 @@ export function Footer() {
                 </a>
               </li>
             </ul>
+          </div>
+
+          {/* Copyright */}
+          <div className="flex items-end">
+            <p className="text-xs text-muted">
+              © 2026 AI Literacy Lab.
+              <br />
+              All rights reserved.
+            </p>
           </div>
         </div>
       </div>

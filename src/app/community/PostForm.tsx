@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import type { PostFormState } from "@/app/actions/posts";
 
 interface PostFormProps {
@@ -19,6 +20,7 @@ interface PostFormProps {
 
 export function PostForm({ action, initialData, isEdit }: PostFormProps) {
   const [state, formAction, pending] = useActionState(action, undefined);
+  const [content, setContent] = useState(initialData?.content ?? "");
   const { data: session } = useSession();
   const role = session?.user?.role as string | undefined;
   const isPrivileged = role === "admin" || role === "manager";
@@ -107,18 +109,11 @@ export function PostForm({ action, initialData, isEdit }: PostFormProps) {
         </div>
 
         <div>
-          <label htmlFor="content" className="block text-sm font-medium mb-2">
+          <label className="block text-sm font-medium mb-2">
             내용
           </label>
-          <textarea
-            id="content"
-            name="content"
-            required
-            rows={12}
-            defaultValue={initialData?.content ?? ""}
-            placeholder="내용을 입력하세요"
-            className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-accent transition-colors resize-y"
-          />
+          <RichTextEditor content={content} onChange={setContent} />
+          <input type="hidden" name="content" value={content} />
           {state?.errors?.content && (
             <p className="mt-1 text-xs text-accent">{state.errors.content[0]}</p>
           )}

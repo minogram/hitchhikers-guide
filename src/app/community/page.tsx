@@ -39,6 +39,10 @@ const typeColor: Record<BoardType, string> = {
   article: "bg-purple-500/10 text-purple-500",
 };
 
+function stripHtml(html: string) {
+  return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+}
+
 export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<BoardType | "all">("all");
   const [posts, setPosts] = useState<PostItem[]>([]);
@@ -159,7 +163,7 @@ export default function CommunityPage() {
                 </div>
                 <h3 className="font-semibold mb-1 truncate">{post.title}</h3>
                 <p className="text-sm text-muted line-clamp-1">
-                  {post.content}
+                  {stripHtml(post.content)}
                 </p>
                 <div className="mt-3 flex items-center gap-4 text-xs text-muted">
                   <span>{post.authorName}</span>

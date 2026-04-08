@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { DeletePostButton } from "./DeletePostButton";
 import { CommentSection } from "./CommentSection";
+import { SafeHtml } from "@/components/SafeHtml";
 
 const typeLabel: Record<string, string> = {
   notice: "공지사항",
@@ -96,9 +97,7 @@ export default async function PostDetailPage({ params }: Props) {
         )}
 
         <div className="border-t border-border pt-8 mb-12">
-          <p className="text-muted leading-relaxed whitespace-pre-wrap">
-            {post.content}
-          </p>
+          <SafeHtml html={post.content} />
         </div>
 
         {/* Comments Section */}

@@ -88,7 +88,7 @@ export default async function AdminPage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <FileText className="h-6 w-6 text-accent" />
-            <h3 className="text-lg font-bold">콘텐츠 관리</h3>
+            <h3 className="text-lg font-bold">게시글 관리</h3>
           </div>
           <p className="text-sm text-muted mb-4">
             게시글과 댓글을 관리합니다.

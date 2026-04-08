@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Sparkles, ImagePlus, Plus, ClipboardPaste, Eye } from "lucide-react";
 import type { AppFormState } from "@/app/actions/apps";
 import { addTagOption } from "@/app/actions/tags";
+import { RichTextEditor } from "@/components/RichTextEditor";
 
 interface AppFormProps {
   action: (prevState: AppFormState | undefined, formData: FormData) => Promise<AppFormState>;
@@ -45,6 +46,7 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, tagGroup
   const [newProcessTag, setNewProcessTag] = useState("");
   const [addingTagError, setAddingTagError] = useState<string | null>(null);
   const [isAddingTag, startAddingTag] = useTransition();
+  const [detailDesc, setDetailDesc] = useState(initialData?.detailDescription ?? "");
 
   async function handleAddTag(label: string, group: "industry" | "process") {
     const trimmed = label.trim();
@@ -264,16 +266,11 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, tagGroup
       </div>
 
       <div>
-        <label htmlFor="detailDescription" className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-2">
           상세 설명
         </label>
-        <textarea
-          id="detailDescription"
-          name="detailDescription"
-          rows={4}
-          defaultValue={initialData?.detailDescription ?? ""}
-          className="w-full resize-none rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-accent transition-colors"
-        />
+        <RichTextEditor content={detailDesc} onChange={setDetailDesc} />
+        <input type="hidden" name="detailDescription" value={detailDesc} />
       </div>
 
       <div>

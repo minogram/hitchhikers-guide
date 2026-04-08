@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { LikeButton } from "@/components/LikeButton";
 import { BackToCatalog } from "./BackToCatalog";
+import { SafeHtml } from "@/components/SafeHtml";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -103,11 +104,7 @@ export default async function AppDetailPage({ params }: Props) {
       {/* Detailed Description */}
       <section className="border-t border-border pt-8 mb-12">
         <h2 className="text-xl font-bold mb-4">상세 설명</h2>
-        <div className="prose prose-neutral dark:prose-invert max-w-none">
-          <p className="text-muted leading-relaxed whitespace-pre-wrap">
-            {app.detailDescription || app.description}
-          </p>
-        </div>
+        <SafeHtml html={app.detailDescription || app.description} />
       </section>
 
       {/* Gemini Demo Section */}
