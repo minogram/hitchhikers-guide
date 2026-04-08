@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Zap, Users, BookOpen } from "lucide-react";
+import { ArrowRight, Zap, Users, BookOpen, Bell } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LikeButton } from "@/components/LikeButton";
@@ -9,7 +9,7 @@ export default async function Home() {
   const session = await auth().catch(() => null);
   const userId = session?.user?.id ?? null;
 
-  const [popularApps, newApps] = await Promise.all([
+  const [popularApps, newApps, pinnedNotices] = await Promise.all([
     prisma.appCard.findMany({
       take: 3,
       orderBy: { likeCount: "desc" },
@@ -19,6 +19,11 @@ export default async function Home() {
       take: 3,
       orderBy: { createdAt: "desc" },
       include: userId ? { likes: { where: { userId }, select: { userId: true } } } : undefined,
+    }),
+    prisma.post.findMany({
+      where: { type: "notice", isPinned: true, isVisible: true },
+      take: 3,
+      orderBy: { createdAt: "desc" },
     }),
   ]);
   return (
@@ -68,6 +73,39 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Pinned Notices Section */}
+      {pinnedNotices.length > 0 && (
+        <section className="border-t border-border bg-accent/5">
+          <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Bell className="h-4 w-4 text-accent" />
+              <span className="text-sm font-semibold text-accent uppercase tracking-widest">
+                공지사항
+              </span>
+            </div>
+            <div className="space-y-2">
+              {pinnedNotices.map((notice) => (
+                <Link
+                  key={notice.id}
+                  href={`/community/${notice.id}`}
+                  className="flex items-center gap-3 rounded-xl border border-accent/20 bg-card px-5 py-3 hover:bg-card-hover transition-colors group"
+                >
+                  <span className="inline-block rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent shrink-0">
+                    공지
+                  </span>
+                  <span className="font-medium text-sm truncate group-hover:text-accent transition-colors">
+                    {notice.title}
+                  </span>
+                  <span className="ml-auto text-xs text-muted shrink-0">
+                    {new Date(notice.createdAt).toLocaleDateString("en-CA")}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="border-t border-border bg-card">
