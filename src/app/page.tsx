@@ -76,12 +76,12 @@ export default async function Home() {
 
       {/* Pinned Notices Section */}
       {pinnedNotices.length > 0 && (
-        <section className="border-t border-border bg-accent/5">
+        <section className="border-t border-border bg-card">
           <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
             <div className="flex items-center gap-2 mb-4">
               <Bell className="h-4 w-4 text-accent" />
               <span className="text-sm font-semibold text-accent uppercase tracking-widest">
-                공지사항
+                NOTICE
               </span>
             </div>
             <div className="space-y-2">
@@ -89,11 +89,8 @@ export default async function Home() {
                 <Link
                   key={notice.id}
                   href={`/community/${notice.id}`}
-                  className="flex items-center gap-3 rounded-xl border border-accent/20 bg-card px-5 py-3 hover:bg-card-hover transition-colors group"
+                  className="flex items-center gap-3 px-5 py-2 hover:bg-card-hover transition-colors group rounded-lg"
                 >
-                  <span className="inline-block rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent shrink-0">
-                    공지
-                  </span>
                   <span className="font-medium text-sm truncate group-hover:text-accent transition-colors">
                     {notice.title}
                   </span>
@@ -108,7 +105,7 @@ export default async function Home() {
       )}
 
       {/* Features Section */}
-      <section className="border-t border-border bg-card">
+      <section className="border-t border-border">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
             <div className="group">
@@ -146,7 +143,7 @@ export default async function Home() {
       </section>
 
       {/* Popular Apps */}
-      <section className="border-t border-border">
+      <section className="border-t border-border bg-card">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="flex items-end justify-between mb-12">
             <div>
@@ -167,7 +164,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {popularApps.map((app) => {
+            {popularApps.map((app, idx) => {
               const industryTags: string[] = JSON.parse(app.industryTags);
               const processTags: string[] = JSON.parse(app.processTags);
               const isLiked = userId ? ((app as typeof app & { likes?: { userId: string }[] }).likes?.length ?? 0) > 0 : false;
@@ -183,6 +180,7 @@ export default async function Home() {
                       alt={app.title}
                       width={400}
                       height={300}
+                      priority={idx === 0}
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
@@ -222,7 +220,7 @@ export default async function Home() {
       </section>
 
       {/* New Apps */}
-      <section className="border-t border-border bg-card">
+      <section className="border-t border-border">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="flex items-end justify-between mb-12">
             <div>
