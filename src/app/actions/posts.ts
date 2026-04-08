@@ -88,8 +88,17 @@ export async function updatePost(
   const isOwner = post.authorId === session.user.id;
   const isPrivileged = role === "admin" || role === "manager";
 
-  if (!isOwner && !isPrivileged) {
-    return { message: "수정 권한이 없습니다." };
+  // notice, article: 관리자/매니저만 수정 가능
+  const adminOnlyTypes = ["notice", "article"];
+  if (adminOnlyTypes.includes(post.type)) {
+    if (!isPrivileged) {
+      return { message: "수정 권한이 없습니다." };
+    }
+  } else {
+    // forum, job: 본인 또는 관리자/매니저
+    if (!isOwner && !isPrivileged) {
+      return { message: "수정 권한이 없습니다." };
+    }
   }
 
   const validated = PostSchema.safeParse({
@@ -132,8 +141,17 @@ export async function deletePost(postId: string): Promise<{ message?: string }> 
   const isOwner = post.authorId === session.user.id;
   const isPrivileged = role === "admin" || role === "manager";
 
-  if (!isOwner && !isPrivileged) {
-    return { message: "삭제 권한이 없습니다." };
+  // notice, article: 관리자/매니저만 삭제 가능
+  const adminOnlyTypes = ["notice", "article"];
+  if (adminOnlyTypes.includes(post.type)) {
+    if (!isPrivileged) {
+      return { message: "삭제 권한이 없습니다." };
+    }
+  } else {
+    // forum, job: 본인 또는 관리자/매니저
+    if (!isOwner && !isPrivileged) {
+      return { message: "삭제 권한이 없습니다." };
+    }
   }
 
   await prisma.post.delete({ where: { id: postId } });

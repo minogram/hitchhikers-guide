@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, Sparkles, Eye, EyeOff, Pencil, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { DeleteAppButton } from "./DeleteAppButton";
-import { toggleAppVisibility } from "@/app/actions/apps";
+import { toggleAppVisibility, bulkSetAppVisibility } from "@/app/actions/apps";
 import type { AdminApp } from "@/app/actions/apps";
 
 const PAGE_SIZE = 20;
@@ -16,6 +16,8 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [, startTransition] = useTransition();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   async function handleToggleVisibility(appId: string) {
     setTogglingId(appId);
@@ -27,6 +29,41 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
         );
       }
       setTogglingId(null);
+    });
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    const pageIds = paginated.map((a) => a.id);
+    const allSelected = pageIds.every((id) => selectedIds.has(id));
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      pageIds.forEach((id) => (allSelected ? next.delete(id) : next.add(id)));
+      return next;
+    });
+  }
+
+  async function handleBulkVisibility(visible: boolean) {
+    const ids = Array.from(selectedIds);
+    if (!ids.length) return;
+    setBulkLoading(true);
+    startTransition(async () => {
+      const result = await bulkSetAppVisibility(ids, visible);
+      if (result.updatedIds) {
+        setApps((prev) =>
+          prev.map((a) => (result.updatedIds!.includes(a.id) ? { ...a, isVisible: visible } : a))
+        );
+        setSelectedIds(new Set());
+      }
+      setBulkLoading(false);
     });
   }
 
@@ -71,10 +108,49 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
         )}
       </div>
 
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-accent/30 bg-accent/5 px-5 py-3">
+          <span className="text-sm font-medium">{selectedIds.size}개 선택됨</span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => handleBulkVisibility(true)}
+              disabled={bulkLoading}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors disabled:opacity-50"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              보이기
+            </button>
+            <button
+              onClick={() => handleBulkVisibility(false)}
+              disabled={bulkLoading}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-foreground/80 px-3 py-1.5 text-xs font-medium text-background hover:bg-foreground transition-colors disabled:opacity-50"
+            >
+              <EyeOff className="h-3.5 w-3.5" />
+              숨기기
+            </button>
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="ml-1 text-xs text-muted hover:text-foreground transition-colors"
+            >
+              선택 해제
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-card-hover">
+              <th className="px-4 py-3 w-10">
+                <input
+                  type="checkbox"
+                  checked={paginated.length > 0 && paginated.every((a) => selectedIds.has(a.id))}
+                  onChange={toggleSelectAll}
+                  className="h-4 w-4 rounded border-border accent-accent cursor-pointer"
+                />
+              </th>
               <th className="px-4 py-3 w-28"></th>
               <th className="text-left px-6 py-3 font-medium text-muted">앱 이름</th>
               <th className="text-left px-6 py-3 font-medium text-muted">태그</th>
@@ -89,6 +165,14 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
               const tags: string[] = JSON.parse(app.tags);
               return (
                 <tr key={app.id} className={`border-b border-border last:border-0 transition-opacity ${app.isVisible ? "" : "opacity-50"}`}>
+                  <td className="px-4 py-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(app.id)}
+                      onChange={() => toggleSelect(app.id)}
+                      className="h-4 w-4 rounded border-border accent-accent cursor-pointer"
+                    />
+                  </td>
                   <td className="px-4 py-2">
                     {app.thumbnail ? (
                       <Image
@@ -166,7 +250,7 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
             })}
             {paginated.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-muted">
+                <td colSpan={8} className="px-6 py-12 text-center text-muted">
                   {query ? "검색 결과가 없습니다." : "등록된 앱이 없습니다."}
                 </td>
               </tr>

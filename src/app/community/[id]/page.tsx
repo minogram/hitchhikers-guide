@@ -44,7 +44,10 @@ export default async function PostDetailPage({ params }: Props) {
   }
 
   const isOwner = currentUserId === post.authorId;
-  const canModify = isOwner || isPrivileged;
+  const adminOnlyTypes = ["notice", "article"];
+  const canModify = adminOnlyTypes.includes(post.type)
+    ? isPrivileged
+    : isOwner || isPrivileged;
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 lg:px-8">

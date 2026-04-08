@@ -67,7 +67,7 @@ export default function CatalogPage() {
           Catalog
         </p>
         <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl">
-          AI App 카탈로그
+          AI APPS
         </h1>
         <p className="mt-4 text-muted max-w-lg">
           패션 산업에 특화된 AI 도구를 산업별, 공정별로 탐색하세요.

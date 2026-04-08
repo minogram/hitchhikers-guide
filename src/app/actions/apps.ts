@@ -217,6 +217,24 @@ export async function toggleAppVisibility(appId: string): Promise<{ error?: stri
   return { isVisible: updated.isVisible };
 }
 
+export async function bulkSetAppVisibility(
+  appIds: string[],
+  visible: boolean
+): Promise<{ error?: string; updatedIds?: string[] }> {
+  const session = await requireAdminOrManager();
+  if (!session) return { error: "권한이 없습니다." };
+  if (!appIds.length) return { error: "선택된 앱이 없습니다." };
+
+  await prisma.appCard.updateMany({
+    where: { id: { in: appIds } },
+    data: { isVisible: visible },
+  });
+
+  revalidatePath("/catalog");
+  revalidatePath("/admin/apps");
+  return { updatedIds: appIds };
+}
+
 export type ImportResult = {
   error?: string;
   created?: number;

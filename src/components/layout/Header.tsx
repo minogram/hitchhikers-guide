@@ -7,8 +7,9 @@ import { Menu, X, Sparkles, LogOut, Shield, UserCircle, Sun, Moon } from "lucide
 import { useTheme } from "@/components/ThemeProvider";
 
 const navigation = [
-  { name: "카탈로그", href: "/catalog" },
-  { name: "커뮤니티", href: "/community" },
+  { name: "AI APPS", href: "/catalog" },
+  { name: "COMMUNITY", href: "/community" },
+  { name: "ABOUT", href: "/about" },
 ];
 
 export function Header() {

@@ -51,7 +51,7 @@ export default async function Home() {
                 href="/catalog"
                 className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
               >
-                카탈로그 탐색
+                앱 탐색
                 <ArrowRight className="h-4 w-4" />
               </Link>
               {!session?.user && (
@@ -109,7 +109,7 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
             <div className="group">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-transparent">
                 <Zap className="h-6 w-6 text-accent" />
               </div>
               <h3 className="text-lg font-bold mb-2">AI 도구 큐레이션</h3>
@@ -119,7 +119,7 @@ export default async function Home() {
               </p>
             </div>
             <div className="group">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-transparent">
                 <Users className="h-6 w-6 text-accent" />
               </div>
               <h3 className="text-lg font-bold mb-2">전문가 커뮤니티</h3>
@@ -129,7 +129,7 @@ export default async function Home() {
               </p>
             </div>
             <div className="group">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-transparent">
                 <BookOpen className="h-6 w-6 text-accent" />
               </div>
               <h3 className="text-lg font-bold mb-2">인사이트 아티클</h3>

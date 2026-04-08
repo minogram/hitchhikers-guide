@@ -89,7 +89,7 @@ export async function getAdminStats() {
 
   const [userCount, appCount, postCount, managerCount] = await Promise.all([
     prisma.user.count(),
-    prisma.appCard.count(),
+    prisma.appCard.count({ where: { isVisible: true } }),
     prisma.post.count(),
     prisma.user.count({ where: { role: "manager" } }),
   ]);
