@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink, Sparkles, Pencil } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { LikeButton } from "@/components/LikeButton";
+import { BackToCatalog } from "./BackToCatalog";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -33,13 +34,7 @@ export default async function AppDetailPage({ params }: Props) {
     <div className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
       {/* Back Link */}
       <div className="flex items-center justify-between mb-8">
-        <Link
-          href="/catalog"
-          className="inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          카탈로그로 돌아가기
-        </Link>
+        <BackToCatalog />
         {isPrivileged && (
           <Link
             href={`/admin/apps/${app.id}/edit`}

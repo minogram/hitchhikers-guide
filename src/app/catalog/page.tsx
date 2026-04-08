@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Search, Filter, Sparkles } from "lucide-react";
 import { LikeButton } from "@/components/LikeButton";
 
@@ -20,16 +21,46 @@ type CatalogApp = {
 };
 
 export default function CatalogPage() {
+  return (
+    <Suspense>
+      <CatalogContent />
+    </Suspense>
+  );
+}
+
+function CatalogContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const [apps, setApps] = useState<CatalogApp[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIndustry, setSelectedIndustry] = useState<Set<string>>(new Set());
-  const [selectedProcess, setSelectedProcess] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
+  const [selectedIndustry, setSelectedIndustry] = useState<Set<string>>(
+    new Set(searchParams.get("industry")?.split(",").filter(Boolean) ?? [])
+  );
+  const [selectedProcess, setSelectedProcess] = useState<Set<string>>(
+    new Set(searchParams.get("process")?.split(",").filter(Boolean) ?? [])
+  );
   const [industryTags, setIndustryTags] = useState<string[]>([]);
   const [processTags, setProcessTags] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(() => {
+    return !!(searchParams.get("industry") || searchParams.get("process"));
+  });
   const [visibleCount, setVisibleCount] = useState(12);
   const PAGE_SIZE = 12;
+
+  // Sync state → URL
+  const syncUrl = useCallback(
+    (q: string, industry: Set<string>, process: Set<string>) => {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (industry.size > 0) params.set("industry", [...industry].join(","));
+      if (process.size > 0) params.set("process", [...process].join(","));
+      const qs = params.toString();
+      router.replace(qs ? `?${qs}` : "/catalog", { scroll: false });
+    },
+    [router]
+  );
 
   useEffect(() => {
     fetch("/api/apps")
@@ -97,7 +128,10 @@ export default function CatalogPage() {
               type="text"
               placeholder="앱 이름 또는 설명으로 검색..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                syncUrl(e.target.value, selectedIndustry, selectedProcess);
+              }}
               className="w-full rounded-full border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
             />
           </div>
@@ -132,6 +166,7 @@ export default function CatalogPage() {
                       setSelectedIndustry((prev) => {
                         const next = new Set(prev);
                         next.has(tag) ? next.delete(tag) : next.add(tag);
+                        syncUrl(searchQuery, next, selectedProcess);
                         return next;
                       })
                     }
@@ -156,6 +191,7 @@ export default function CatalogPage() {
                       setSelectedProcess((prev) => {
                         const next = new Set(prev);
                         next.has(tag) ? next.delete(tag) : next.add(tag);
+                        syncUrl(searchQuery, selectedIndustry, next);
                         return next;
                       })
                     }
@@ -175,6 +211,7 @@ export default function CatalogPage() {
                 onClick={() => {
                   setSelectedIndustry(new Set());
                   setSelectedProcess(new Set());
+                  syncUrl(searchQuery, new Set(), new Set());
                 }}
                 className="text-xs text-muted hover:text-foreground transition-colors"
               >
