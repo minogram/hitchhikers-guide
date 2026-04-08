@@ -47,6 +47,16 @@ export async function togglePin(postId: string) {
   const post = await prisma.post.findUnique({ where: { id: postId } });
   if (!post) return { error: "게시글을 찾을 수 없습니다." };
 
+  // Enforce max 3 pinned notices on the landing page
+  if (post.type === "notice" && !post.isPinned) {
+    const pinnedCount = await prisma.post.count({
+      where: { type: "notice", isPinned: true },
+    });
+    if (pinnedCount >= 3) {
+      return { error: "랜딩 페이지에 고정할 수 있는 공지는 최대 3개입니다." };
+    }
+  }
+
   await prisma.post.update({
     where: { id: postId },
     data: { isPinned: !post.isPinned },
@@ -54,6 +64,7 @@ export async function togglePin(postId: string) {
 
   revalidatePath("/admin/posts");
   revalidatePath("/community");
+  revalidatePath("/");
   return { success: true };
 }
 
@@ -74,6 +85,7 @@ export async function togglePostVisibility(postId: string) {
 
   revalidatePath('/admin/posts');
   revalidatePath('/community');
+  revalidatePath('/');
   return { isVisible: updated.isVisible };
 }
 

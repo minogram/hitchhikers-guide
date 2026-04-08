@@ -25,6 +25,8 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [posts, setPosts] = useState<AdminPost[]>(initialPosts);
   const [togglingVisibilityId, setTogglingVisibilityId] = useState<string | null>(null);
+  const [togglingPinId, setTogglingPinId] = useState<string | null>(null);
+  const [pinError, setPinError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const filtered = posts.filter((post) => {
@@ -38,11 +40,21 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
     );
   });
 
-  function handleTogglePin(postId: string) {
-    startTransition(async () => {
-      await togglePin(postId);
-      setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, isPinned: !p.isPinned } : p));
-    });
+  async function handleTogglePin(postId: string, postType: string) {
+    setPinError(null);
+    setTogglingPinId(postId);
+    try {
+      const result = await togglePin(postId);
+      if (result?.error) {
+        if (postType === "notice") {
+          setPinError(result.error);
+        }
+      } else {
+        setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, isPinned: !p.isPinned } : p));
+      }
+    } finally {
+      setTogglingPinId(null);
+    }
   }
 
   async function handleToggleVisibility(postId: string) {
@@ -91,6 +103,12 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
         <p className="mb-4 text-xs text-muted">검색 결과: {filtered.length}건</p>
       ) : null}
 
+      {pinError && (
+        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
+          {pinError}
+        </div>
+      )}
+
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -100,6 +118,7 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
               <th className="text-left px-6 py-3 font-medium text-muted">작성자</th>
               <th className="text-left px-6 py-3 font-medium text-muted">작성일</th>
               <th className="text-left px-6 py-3 font-medium text-muted">댓글</th>
+              <th className="text-left px-6 py-3 font-medium text-muted">랜딩 고정</th>
               <th className="text-left px-6 py-3 font-medium text-muted">작업</th>
             </tr>
           </thead>
@@ -120,7 +139,7 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
                     href={`/community/${post.id}`}
                     className="font-medium hover:text-accent transition-colors"
                   >
-                    {post.isPinned && <span className="mr-1">📌</span>}
+                    {post.isPinned && post.type !== "notice" && <span className="mr-1">📌</span>}
                     {post.title}
                   </Link>
                 </td>
@@ -129,6 +148,37 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
                   {new Date(post.createdAt).toLocaleDateString("en-CA")}
                 </td>
                 <td className="px-6 py-4 text-muted">{post._count.comments}</td>
+                <td className="px-6 py-4">
+                  {post.type === "notice" ? (
+                    <button
+                      onClick={() => handleTogglePin(post.id, post.type)}
+                      disabled={togglingPinId === post.id}
+                      title={post.isPinned ? "랜딩 고정 해제" : "랜딩 페이지에 고정"}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none disabled:opacity-40 ${
+                        post.isPinned ? "bg-accent" : "bg-border"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+                          post.isPinned ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleTogglePin(post.id, post.type)}
+                      disabled={togglingPinId === post.id}
+                      title={post.isPinned ? "고정 해제" : "고정"}
+                      className={`p-1.5 rounded-lg transition-colors disabled:opacity-50 ${
+                        post.isPinned
+                          ? "text-accent hover:bg-accent/10"
+                          : "text-muted hover:text-foreground hover:bg-card-hover"
+                      }`}
+                    >
+                      <Pin className="h-4 w-4" />
+                    </button>
+                  )}
+                </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1">
                     <button
@@ -142,18 +192,6 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
                       }`}
                     >
                       {post.isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                    </button>
-                    <button
-                      onClick={() => handleTogglePin(post.id)}
-                      disabled={isPending}
-                      title={post.isPinned ? "고정 해제" : "고정"}
-                      className={`p-1.5 rounded-lg transition-colors disabled:opacity-50 ${
-                        post.isPinned
-                          ? "text-accent hover:bg-accent/10"
-                          : "text-muted hover:text-foreground hover:bg-card-hover"
-                      }`}
-                    >
-                      <Pin className="h-4 w-4" />
                     </button>
                     <Link
                       href={`/community/${post.id}/edit`}
@@ -176,7 +214,7 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-muted">
+                <td colSpan={7} className="px-6 py-12 text-center text-muted">
                   {query || typeFilter !== "all"
                     ? "검색 결과가 없습니다."
                     : "게시글이 없습니다."}
