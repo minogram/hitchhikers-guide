@@ -13,7 +13,7 @@ interface Props {
 export default async function EditAppPage({ params }: Props) {
   await requireRole("admin", "manager");
   const { id } = await params;
-  const [app, { tags }] = await Promise.all([getAppById(id), getTagOptions()]);
+  const [app, tagGroups] = await Promise.all([getAppById(id), getTagOptions()]);
 
   if (!app) notFound();
 
@@ -47,7 +47,7 @@ export default async function EditAppPage({ params }: Props) {
         </p>
       </div>
 
-      <EditAppForm appId={id} initialData={initialData} tagOptions={tags} />
+      <EditAppForm appId={id} initialData={initialData} tagGroups={tagGroups} />
     </div>
   );
 }

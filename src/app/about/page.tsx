@@ -48,14 +48,18 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="font-serif text-2xl font-bold mb-1">신용남</h3>
+                <h3 className="font-serif text-2xl font-bold mb-1">PhD Shin Yong Nam · 신용남</h3>
                 <p className="text-accent font-medium mb-4">교수 · AI Literacy Lab 디렉터</p>
-                <p className="text-muted leading-relaxed mb-6">
+                <p className="text-muted leading-relaxed mb-4">
                   패션 테크놀로지와 AI 응용 분야를 연구하며, 패션 산업에서의
                   인공지능 활용 가능성을 탐구하고 있습니다.
                   디자인 프로세스의 혁신부터 공급망 최적화, 소비자 경험 개인화까지
                   폭넓은 영역에서 AI와 패션의 접점을 연구하고 교육합니다.
                 </p>
+                <div className="flex flex-col gap-1 text-sm text-muted mb-6">
+                  <span>✉ 386com@hanmail.net</span>
+                  <span>✆ +82-10-3736-3064</span>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {["Fashion Technology", "AI/ML Application", "Design Innovation", "Digital Transformation"].map((tag) => (
                     <span

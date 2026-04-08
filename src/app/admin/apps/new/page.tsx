@@ -7,7 +7,7 @@ import { getTagOptions } from "@/app/actions/tags";
 
 export default async function NewAppPage() {
   await requireRole("admin", "manager");
-  const { tags } = await getTagOptions();
+  const tagGroups = await getTagOptions();
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-12 lg:px-8">
@@ -31,7 +31,7 @@ export default async function NewAppPage() {
       <AppForm
         action={createApp}
         submitLabel="앱 등록"
-        tagOptions={tags}
+        tagGroups={tagGroups}
       />
     </div>
   );

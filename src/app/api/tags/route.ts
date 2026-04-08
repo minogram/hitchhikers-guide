@@ -5,7 +5,7 @@ export async function GET() {
   const tags = await prisma.tagOption.findMany({
     orderBy: [{ createdAt: "asc" }],
   });
-  return NextResponse.json({
-    tags: tags.map((t) => t.label),
-  });
+  const industry = tags.filter((t) => t.type === "industry").map((t) => t.label);
+  const process = tags.filter((t) => t.type === "process").map((t) => t.label);
+  return NextResponse.json({ industry, process });
 }

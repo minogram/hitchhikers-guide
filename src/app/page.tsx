@@ -9,14 +9,16 @@ export default async function Home() {
   const session = await auth().catch(() => null);
   const userId = session?.user?.id ?? null;
 
-  const [popularApps, newApps, pinnedNotices] = await Promise.all([
+  const [popularApps, newApps, pinnedNotices, tagOptions] = await Promise.all([
     prisma.appCard.findMany({
       take: 3,
+      where: { isVisible: true },
       orderBy: { likeCount: "desc" },
       include: userId ? { likes: { where: { userId }, select: { userId: true } } } : undefined,
     }),
     prisma.appCard.findMany({
       take: 3,
+      where: { isVisible: true },
       orderBy: { createdAt: "desc" },
       include: userId ? { likes: { where: { userId }, select: { userId: true } } } : undefined,
     }),
@@ -25,7 +27,18 @@ export default async function Home() {
       take: 3,
       orderBy: { createdAt: "desc" },
     }),
+    prisma.tagOption.findMany({ where: { type: "industry" }, select: { label: true } }),
   ]);
+
+  const industrySet = new Set(tagOptions.map((t) => t.label));
+
+  function splitTags(app: { tags: string }) {
+    const tags: string[] = JSON.parse(app.tags);
+    return {
+      industryTags: tags.filter((t) => industrySet.has(t)),
+      processTags: tags.filter((t) => !industrySet.has(t)),
+    };
+  }
   return (
     <>
       {/* Hero Section */}
@@ -165,8 +178,7 @@ export default async function Home() {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {popularApps.map((app, idx) => {
-              const industryTags: string[] = JSON.parse(app.industryTags);
-              const processTags: string[] = JSON.parse(app.processTags);
+              const { industryTags, processTags } = splitTags(app);
               const isLiked = userId ? ((app as typeof app & { likes?: { userId: string }[] }).likes?.length ?? 0) > 0 : false;
               return (
                 <Link
@@ -242,8 +254,7 @@ export default async function Home() {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {newApps.map((app) => {
-              const industryTags: string[] = JSON.parse(app.industryTags);
-              const processTags: string[] = JSON.parse(app.processTags);
+              const { industryTags, processTags } = splitTags(app);
               const isLiked = userId ? ((app as typeof app & { likes?: { userId: string }[] }).likes?.length ?? 0) > 0 : false;
               return (
                 <Link

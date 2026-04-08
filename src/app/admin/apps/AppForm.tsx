@@ -21,13 +21,13 @@ interface AppFormProps {
   };
   submitLabel: string;
   redirectTo?: string;
-  tagOptions: string[];
+  tagGroups: { industry: string[]; process: string[] };
 }
 
-export function AppForm({ action, initialData, submitLabel, redirectTo, tagOptions: initialTagOptions }: AppFormProps) {
+export function AppForm({ action, initialData, submitLabel, redirectTo, tagGroups: initialTagGroups }: AppFormProps) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(action, undefined);
-  const [tagOptions, setTagOptions] = useState<string[]>(initialTagOptions);
+  const [tagGroups, setTagGroups] = useState(initialTagGroups);
   const [selectedTags, setSelectedTags] = useState<Set<string>>(
     new Set(initialData?.tags ?? [])
   );
@@ -41,22 +41,26 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, tagOptio
   const [isVisible, setIsVisible] = useState(initialData?.isVisible ?? true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [newTag, setNewTag] = useState("");
+  const [newIndustryTag, setNewIndustryTag] = useState("");
+  const [newProcessTag, setNewProcessTag] = useState("");
   const [addingTagError, setAddingTagError] = useState<string | null>(null);
   const [isAddingTag, startAddingTag] = useTransition();
 
-  async function handleAddTag(label: string) {
+  async function handleAddTag(label: string, group: "industry" | "process") {
     const trimmed = label.trim();
     if (!trimmed) return;
     setAddingTagError(null);
     startAddingTag(async () => {
-      const result = await addTagOption(trimmed);
+      const result = await addTagOption(trimmed, group);
       if (result.error) {
         setAddingTagError(result.error);
       } else {
-        setTagOptions((prev) => [...prev, trimmed]);
+        setTagGroups((prev) => ({
+          ...prev,
+          [group]: [...prev[group], trimmed],
+        }));
         setSelectedTags((prev) => new Set([...prev, trimmed]));
-        setNewTag("");
+        group === "industry" ? setNewIndustryTag("") : setNewProcessTag("");
       }
     });
   }
@@ -288,50 +292,103 @@ export function AppForm({ action, initialData, submitLabel, redirectTo, tagOptio
 
       <div>
         <label className="block text-sm font-medium mb-3">태그 *</label>
-        <div className="flex flex-wrap gap-2">
-          {tagOptions.map((tag) => (
-            <label key={tag} className="cursor-pointer">
+        <div className="space-y-4">
+          <div>
+            <p className="text-xs text-muted mb-2 uppercase tracking-wider font-medium">Industry</p>
+            <div className="flex flex-wrap gap-2">
+              {tagGroups.industry.map((tag) => (
+                <label key={tag} className="cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="tagsChecked"
+                    value={tag}
+                    checked={selectedTags.has(tag)}
+                    onChange={(e) => setSelectedTags((prev) => {
+                      const next = new Set(prev);
+                      e.target.checked ? next.add(tag) : next.delete(tag);
+                      return next;
+                    })}
+                    className="peer sr-only"
+                  />
+                  <span className="inline-block rounded-full px-4 py-1.5 text-sm font-medium border border-border peer-checked:bg-accent peer-checked:text-white peer-checked:border-accent transition-colors">
+                    {tag}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-2 flex items-center gap-2">
               <input
-                type="checkbox"
-                name="tagsChecked"
-                value={tag}
-                checked={selectedTags.has(tag)}
-                onChange={(e) => setSelectedTags((prev) => {
-                  const next = new Set(prev);
-                  e.target.checked ? next.add(tag) : next.delete(tag);
-                  return next;
-                })}
-                className="peer sr-only"
+                type="text"
+                value={newIndustryTag}
+                onChange={(e) => setNewIndustryTag(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddTag(newIndustryTag, "industry");
+                  }
+                }}
+                placeholder="새 Industry 태그"
+                className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent transition-colors w-40"
               />
-              <span className="inline-block rounded-full px-4 py-1.5 text-sm font-medium border border-border peer-checked:bg-accent peer-checked:text-white peer-checked:border-accent transition-colors">
-                {tag}
-              </span>
-            </label>
-          ))}
-        </div>
-        <div className="mt-2 flex items-center gap-2">
-          <input
-            type="text"
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddTag(newTag);
-              }
-            }}
-            placeholder="새 태그 입력"
-            className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent transition-colors w-40"
-          />
-          <button
-            type="button"
-            disabled={isAddingTag || !newTag.trim()}
-            onClick={() => handleAddTag(newTag)}
-            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            추가
-          </button>
+              <button
+                type="button"
+                disabled={isAddingTag || !newIndustryTag.trim()}
+                onClick={() => handleAddTag(newIndustryTag, "industry")}
+                className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                추가
+              </button>
+            </div>
+          </div>
+          <div>
+            <p className="text-xs text-muted mb-2 uppercase tracking-wider font-medium">Process</p>
+            <div className="flex flex-wrap gap-2">
+              {tagGroups.process.map((tag) => (
+                <label key={tag} className="cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="tagsChecked"
+                    value={tag}
+                    checked={selectedTags.has(tag)}
+                    onChange={(e) => setSelectedTags((prev) => {
+                      const next = new Set(prev);
+                      e.target.checked ? next.add(tag) : next.delete(tag);
+                      return next;
+                    })}
+                    className="peer sr-only"
+                  />
+                  <span className="inline-block rounded-full px-4 py-1.5 text-sm font-medium border border-border peer-checked:bg-accent peer-checked:text-white peer-checked:border-accent transition-colors">
+                    {tag}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                type="text"
+                value={newProcessTag}
+                onChange={(e) => setNewProcessTag(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddTag(newProcessTag, "process");
+                  }
+                }}
+                placeholder="새 Process 태그"
+                className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent transition-colors w-40"
+              />
+              <button
+                type="button"
+                disabled={isAddingTag || !newProcessTag.trim()}
+                onClick={() => handleAddTag(newProcessTag, "process")}
+                className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                추가
+              </button>
+            </div>
+          </div>
         </div>
         {addingTagError && (
           <p className="mt-1 text-xs text-red-500">{addingTagError}</p>

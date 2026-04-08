@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Users, AppWindow, FileText, Settings, Shield, Plus } from "lucide-react";
+import { Users, AppWindow, FileText, Settings, Shield, Plus, Tag, Hash } from "lucide-react";
 import { requireRole } from "@/lib/auth-guard";
 import { getAdminStats, getUsers } from "@/app/actions/admin";
 
@@ -27,8 +27,8 @@ export default async function AdminPage() {
         {[
           { label: "전체 사용자", value: stats?.userCount ?? 0, icon: Users, href: "/admin/users" },
           { label: "등록된 앱", value: stats?.appCount ?? 0, icon: AppWindow, href: "/admin/apps" },
+          { label: "태그", value: stats?.tagCount ?? 0, icon: Hash, href: "/admin/tags" },
           { label: "게시글", value: stats?.postCount ?? 0, icon: FileText, href: "/admin/posts" },
-          { label: "매니저", value: stats?.managerCount ?? 0, icon: Shield, href: "/admin/users" },
         ].map((stat) => (
           <Link
             key={stat.label}
@@ -95,6 +95,23 @@ export default async function AdminPage() {
           </p>
           <span className="inline-flex items-center gap-1 text-sm font-medium text-accent">
             <Settings className="h-4 w-4" />
+            관리하기
+          </span>
+        </Link>
+
+        <Link
+          href="/admin/tags"
+          className="group rounded-2xl border border-border bg-card p-6 hover:bg-card-hover transition-colors"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <Tag className="h-6 w-6 text-accent" />
+            <h3 className="text-lg font-bold">태그 관리</h3>
+          </div>
+          <p className="text-sm text-muted mb-4">
+            Industry / Process 태그를 추가, 수정, 삭제합니다.
+          </p>
+          <span className="inline-flex items-center gap-1 text-sm font-medium text-accent">
+            <Tag className="h-4 w-4" />
             관리하기
           </span>
         </Link>

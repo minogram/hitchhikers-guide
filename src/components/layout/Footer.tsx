@@ -25,25 +25,17 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted">
               <li>
                 <Link href="/catalog" className="hover:text-foreground transition-colors">
-                  AI 앱 카탈로그
+                  AI APPS
                 </Link>
               </li>
               <li>
                 <Link href="/community" className="hover:text-foreground transition-colors">
-                  커뮤니티
+                  COMMUNITY
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="text-sm font-semibold mb-4">문의</h3>
-            <ul className="space-y-2 text-sm text-muted">
-              <li>help@falab.kr</li>
               <li>
-                <Link href="/community?type=forum" className="hover:text-foreground transition-colors">
-                  포럼에서 질문하기
+                <Link href="/about" className="hover:text-foreground transition-colors">
+                  ABOUT
                 </Link>
               </li>
             </ul>

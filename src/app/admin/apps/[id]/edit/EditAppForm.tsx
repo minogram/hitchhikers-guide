@@ -14,10 +14,10 @@ interface EditAppFormProps {
     hasGeminiDemo: boolean;
     thumbnail: string;
   };
-  tagOptions: string[];
+  tagGroups: { industry: string[]; process: string[] };
 }
 
-export function EditAppForm({ appId, initialData, tagOptions }: EditAppFormProps) {
+export function EditAppForm({ appId, initialData, tagGroups }: EditAppFormProps) {
   const boundAction = async (
     prevState: AppFormState | undefined,
     formData: FormData
@@ -31,7 +31,7 @@ export function EditAppForm({ appId, initialData, tagOptions }: EditAppFormProps
       initialData={initialData}
       submitLabel="수정 저장"
       redirectTo={`/catalog/${appId}`}
-      tagOptions={tagOptions}
+      tagGroups={tagGroups}
     />
   );
 }

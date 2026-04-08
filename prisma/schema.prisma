@@ -77,6 +77,7 @@ model TagOption {
   id        String   @id @default(cuid())
   type      String   @default("tag") // tag (formerly industry | process)
   label     String
+  sortOrder Int      @default(0)
   createdAt DateTime @default(now())
 
   @@unique([type, label])
