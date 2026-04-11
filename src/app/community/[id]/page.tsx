@@ -35,7 +35,7 @@ export default async function PostDetailPage({ params }: Props) {
     notFound();
   }
 
-  const session = await auth();
+  const session = await auth().catch(() => null);
   const currentUserId = session?.user?.id;
   const role = (session?.user?.role as string) ?? "";
   const isPrivileged = role === "admin" || role === "manager";
@@ -71,7 +71,7 @@ export default async function PostDetailPage({ params }: Props) {
           <div className="flex items-center gap-4 text-sm text-muted">
             <span className="inline-flex items-center gap-1">
               <User className="h-4 w-4" />
-              {post.author.name}
+              {post.author?.name ?? "알 수 없음"}
             </span>
             <span className="inline-flex items-center gap-1">
               <Clock className="h-4 w-4" />
@@ -107,7 +107,7 @@ export default async function PostDetailPage({ params }: Props) {
             id: c.id,
             content: c.content,
             authorId: c.authorId,
-            authorName: c.author.name,
+            authorName: c.author?.name ?? "알 수 없음",
             createdAt: c.createdAt.toISOString(),
           }))}
           currentUserId={currentUserId}
