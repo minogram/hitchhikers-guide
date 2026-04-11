@@ -25,6 +25,10 @@ export default async function AppDetailPage({ params }: Props) {
   const isPrivileged = role === "admin" || role === "manager";
   const userId = session?.user?.id ?? null;
 
+  if (!app.isVisible && !isPrivileged) {
+    notFound();
+  }
+
   const isLiked = userId
     ? !!(await prisma.appLike.findUnique({ where: { userId_appId: { userId, appId: id } } }))
     : false;
