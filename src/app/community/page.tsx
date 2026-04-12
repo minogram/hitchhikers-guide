@@ -110,7 +110,7 @@ export default function CommunityPage() {
       {/* Actions */}
       <div className="flex items-center justify-between mb-8">
         {/* Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex flex-wrap gap-2">
           {tabs.map((tab) => (
             <button
               key={tab.type}
@@ -130,7 +130,7 @@ export default function CommunityPage() {
         {session?.user && (
           <Link
             href="/community/new"
-            className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
           >
             <Plus className="h-4 w-4" />
             글쓰기
