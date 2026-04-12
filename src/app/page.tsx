@@ -90,12 +90,12 @@ export default async function Home() {
       {/* Pinned Notices Section */}
       {pinnedNotices.length > 0 && (
         <section className="border-t border-border bg-card">
-          <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
             <div className="flex items-center gap-2 mb-4">
-              <Bell className="h-4 w-4 text-accent" />
               <span className="text-sm font-semibold text-accent uppercase tracking-widest">
                 NOTICE
               </span>
+              <Bell className="h-4 w-4 text-accent" />
             </div>
             <div className="space-y-2">
               {pinnedNotices.map((notice) => (
