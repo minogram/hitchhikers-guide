@@ -77,6 +77,7 @@ export async function createApp(
     },
   });
 
+  revalidatePath("/");
   revalidatePath("/catalog");
   revalidatePath("/admin/apps");
   return { success: true, message: "앱이 등록되었습니다." };
@@ -139,6 +140,7 @@ export async function updateApp(
     },
   });
 
+  revalidatePath("/");
   revalidatePath("/catalog");
   revalidatePath("/admin/apps");
   return { success: true, message: "앱이 수정되었습니다." };
@@ -160,6 +162,7 @@ export async function deleteApp(appId: string) {
 
   await prisma.appCard.delete({ where: { id: appId } });
 
+  revalidatePath("/");
   revalidatePath("/catalog");
   revalidatePath("/admin/apps");
   return { success: true };
@@ -212,6 +215,7 @@ export async function toggleAppVisibility(appId: string): Promise<{ error?: stri
     select: { isVisible: true },
   });
 
+  revalidatePath("/");
   revalidatePath("/catalog");
   revalidatePath("/admin/apps");
   return { isVisible: updated.isVisible };
@@ -230,6 +234,7 @@ export async function bulkSetAppVisibility(
     data: { isVisible: visible },
   });
 
+  revalidatePath("/");
   revalidatePath("/catalog");
   revalidatePath("/admin/apps");
   return { updatedIds: appIds };
@@ -293,6 +298,7 @@ export async function importAppsFromJson(jsonText: string): Promise<ImportResult
     created++;
   }
 
+  revalidatePath("/");
   revalidatePath("/catalog");
   revalidatePath("/admin/apps");
   return { created, skipped: skippedTitles.length, skippedTitles };
