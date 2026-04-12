@@ -162,6 +162,31 @@ export default async function AdminPage() {
           </table>
         </div>
       </section>
+
+      {/* Note */}
+      <section className="mt-12 rounded-2xl border border-border bg-card p-6">
+        <h2 className="text-sm font-semibold text-accent uppercase tracking-widest mb-4">Note</h2>
+        <div className="space-y-2 text-sm text-muted">
+          <p>
+            GitHub:{" "}
+            <a href="https://github.com/minogram/hitchhikers-guide" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-accent transition-colors underline underline-offset-2">
+              minogram/hitchhikers-guide
+            </a>
+          </p>
+          <p>
+            Site:{" "}
+            <a href="https://hitchhikers-guide-black.vercel.app" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-accent transition-colors underline underline-offset-2">
+              hitchhikers-guide-black.vercel.app
+            </a>
+          </p>
+          <p>
+            개발자:{" "}
+            <a href="mailto:michael@minogram.com" className="text-foreground hover:text-accent transition-colors underline underline-offset-2">
+              michael@minogram.com
+            </a>
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
