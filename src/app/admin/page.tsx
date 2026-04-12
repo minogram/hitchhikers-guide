@@ -108,7 +108,7 @@ export default async function AdminPage() {
             <h3 className="text-lg font-bold">태그 관리</h3>
           </div>
           <p className="text-sm text-muted mb-4">
-            Industry / Process 태그를 추가, 수정, 삭제합니다.
+            태그를 추가, 수정, 삭제합니다.
           </p>
           <span className="inline-flex items-center gap-1 text-sm font-medium text-accent">
             <Tag className="h-4 w-4" />
