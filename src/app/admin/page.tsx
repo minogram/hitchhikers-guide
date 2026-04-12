@@ -180,7 +180,7 @@ export default async function AdminPage() {
             </a>
           </p>
           <p>
-            개발자:{" "}
+            Dev:{" "}
             <a href="mailto:michael@minogram.com" className="text-foreground hover:text-accent transition-colors underline underline-offset-2">
               michael@minogram.com
             </a>
