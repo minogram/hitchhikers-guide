@@ -7,7 +7,7 @@ import { ApiKeySection } from "./ApiKeySection";
 import { DeleteAccountSection } from "./DeleteAccountSection";
 
 export default async function MyPage() {
-  const session = await auth();
+  const session = await auth().catch(() => null);
   if (!session?.user) {
     redirect("/login");
   }

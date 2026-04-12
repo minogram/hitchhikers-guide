@@ -10,7 +10,7 @@ interface Props {
 
 export default async function EditPostPage({ params }: Props) {
   const { id } = await params;
-  const session = await auth();
+  const session = await auth().catch(() => null);
   if (!session?.user) {
     redirect("/login");
   }

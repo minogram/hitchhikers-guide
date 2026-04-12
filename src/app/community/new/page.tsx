@@ -4,7 +4,7 @@ import { PostForm } from "../PostForm";
 import { createPost } from "@/app/actions/posts";
 
 export default async function NewPostPage() {
-  const session = await auth();
+  const session = await auth().catch(() => null);
   if (!session?.user) {
     redirect("/login");
   }

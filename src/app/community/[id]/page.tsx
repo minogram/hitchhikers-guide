@@ -35,7 +35,7 @@ export default async function PostDetailPage({ params }: Props) {
     notFound();
   }
 
-  const session = await auth();
+  const session = await auth().catch(() => null);
   const currentUserId = session?.user?.id;
   const role = (session?.user?.role as string) ?? "";
   const isPrivileged = role === "admin" || role === "manager";
