@@ -193,6 +193,7 @@ export default async function Home() {
                       width={400}
                       height={300}
                       priority={idx === 0}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
@@ -268,6 +269,7 @@ export default async function Home() {
                       alt={app.title}
                       width={400}
                       height={300}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>

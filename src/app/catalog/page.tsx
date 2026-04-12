@@ -132,6 +132,7 @@ function CatalogContent() {
                 setSearchQuery(e.target.value);
                 syncUrl(e.target.value, selectedIndustry, selectedProcess);
               }}
+              aria-label="앱 검색"
               className="w-full rounded-full border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
             />
           </div>
@@ -241,6 +242,7 @@ function CatalogContent() {
                 alt={app.title}
                 width={400}
                 height={300}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               {app.hasGeminiDemo && (

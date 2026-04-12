@@ -96,6 +96,7 @@ export default function CommunityPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="제목, 내용, 작성자로 검색..."
+            aria-label="게시글 검색"
             className="w-full rounded-xl border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
           />
         </div>
