@@ -18,13 +18,22 @@ export async function createComment(postId: string, content: string) {
     return { error: "댓글은 2000자 이내로 작성해주세요." };
   }
 
-  await prisma.comment.create({
-    data: {
-      content: content.trim(),
-      postId,
-      authorId: session.user.id!,
-    },
-  });
+  const post = await prisma.post.findUnique({ where: { id: postId }, select: { id: true } });
+  if (!post) {
+    return { error: "게시글을 찾을 수 없습니다." };
+  }
+
+  try {
+    await prisma.comment.create({
+      data: {
+        content: content.trim(),
+        postId,
+        authorId: session.user.id!,
+      },
+    });
+  } catch {
+    return { error: "댓글 작성 중 오류가 발생했습니다." };
+  }
 
   revalidatePath(`/community/${postId}`);
   return { success: true };
@@ -52,7 +61,11 @@ export async function deleteComment(commentId: string) {
     return { error: "삭제 권한이 없습니다." };
   }
 
-  await prisma.comment.delete({ where: { id: commentId } });
+  try {
+    await prisma.comment.delete({ where: { id: commentId } });
+  } catch {
+    return { error: "댓글 삭제 중 오류가 발생했습니다." };
+  }
 
   revalidatePath(`/community/${comment.postId}`);
   return { success: true };

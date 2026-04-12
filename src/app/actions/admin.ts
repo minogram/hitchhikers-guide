@@ -19,10 +19,14 @@ export async function updateUserRole(userId: string, newRole: string) {
     return { error: "유효하지 않은 등급입니다." };
   }
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { role: newRole },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { role: newRole },
+    });
+  } catch {
+    return { error: "등급 변경 중 오류가 발생했습니다." };
+  }
 
   revalidatePath("/admin/users");
   return { success: true };
@@ -72,10 +76,14 @@ export async function deleteUser(userId: string) {
     return { error: "관리자 계정은 삭제할 수 없습니다." };
   }
 
-  await prisma.comment.deleteMany({ where: { authorId: userId } });
-  await prisma.post.deleteMany({ where: { authorId: userId } });
-  await prisma.appCard.deleteMany({ where: { createdBy: userId } });
-  await prisma.user.delete({ where: { id: userId } });
+  try {
+    await prisma.comment.deleteMany({ where: { authorId: userId } });
+    await prisma.post.deleteMany({ where: { authorId: userId } });
+    await prisma.appCard.deleteMany({ where: { createdBy: userId } });
+    await prisma.user.delete({ where: { id: userId } });
+  } catch {
+    return { error: "사용자 삭제 중 오류가 발생했습니다." };
+  }
 
   revalidatePath("/admin/users");
   return { success: true };

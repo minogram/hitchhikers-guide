@@ -3,9 +3,14 @@
 import { useActionState, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowLeft } from "lucide-react";
-import { RichTextEditor } from "@/components/RichTextEditor";
 import type { PostFormState } from "@/app/actions/posts";
+
+const RichTextEditor = dynamic(
+  () => import("@/components/RichTextEditor").then((m) => m.RichTextEditor),
+  { ssr: false, loading: () => <div className="h-64 rounded-xl border border-border bg-card animate-pulse" /> }
+);
 
 interface PostFormProps {
   action: (prevState: PostFormState | undefined, formData: FormData) => Promise<PostFormState>;

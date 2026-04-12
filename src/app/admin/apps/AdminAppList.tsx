@@ -139,8 +139,8 @@ export function AdminAppList({ apps: initialApps }: { apps: AdminApp[] }) {
         </div>
       )}
 
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="rounded-2xl border border-border bg-card overflow-x-auto">
+        <table className="w-full text-sm min-w-[800px]">
           <thead>
             <tr className="border-b border-border bg-card-hover">
               <th className="px-4 py-3 w-10">

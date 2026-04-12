@@ -55,15 +55,19 @@ export async function createPost(
 
   const canPin = role === "admin" || role === "manager";
 
-  await prisma.post.create({
-    data: {
-      type: validated.data.type,
-      title: validated.data.title,
-      content: validated.data.content,
-      isPinned: canPin ? (validated.data.isPinned ?? false) : false,
-      authorId: session.user.id!,
-    },
-  });
+  try {
+    await prisma.post.create({
+      data: {
+        type: validated.data.type,
+        title: validated.data.title,
+        content: validated.data.content,
+        isPinned: canPin ? (validated.data.isPinned ?? false) : false,
+        authorId: session.user.id!,
+      },
+    });
+  } catch {
+    return { message: "게시글 작성 중 오류가 발생했습니다." };
+  }
 
   revalidatePath("/community");
   redirect("/community");
@@ -112,14 +116,18 @@ export async function updatePost(
     return { errors: validated.error.flatten().fieldErrors };
   }
 
-  await prisma.post.update({
-    where: { id: postId },
-    data: {
-      title: validated.data.title,
-      content: validated.data.content,
-      isPinned: isPrivileged ? (validated.data.isPinned ?? false) : post.isPinned,
-    },
-  });
+  try {
+    await prisma.post.update({
+      where: { id: postId },
+      data: {
+        title: validated.data.title,
+        content: validated.data.content,
+        isPinned: isPrivileged ? (validated.data.isPinned ?? false) : post.isPinned,
+      },
+    });
+  } catch {
+    return { message: "게시글 수정 중 오류가 발생했습니다." };
+  }
 
   revalidatePath("/community");
   revalidatePath(`/community/${postId}`);
@@ -154,7 +162,11 @@ export async function deletePost(postId: string): Promise<{ message?: string }> 
     }
   }
 
-  await prisma.post.delete({ where: { id: postId } });
+  try {
+    await prisma.post.delete({ where: { id: postId } });
+  } catch {
+    return { message: "게시글 삭제 중 오류가 발생했습니다." };
+  }
 
   revalidatePath("/community");
   redirect("/community");

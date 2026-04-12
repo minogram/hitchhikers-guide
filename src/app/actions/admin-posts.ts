@@ -57,10 +57,14 @@ export async function togglePin(postId: string) {
     }
   }
 
-  await prisma.post.update({
-    where: { id: postId },
-    data: { isPinned: !post.isPinned },
-  });
+  try {
+    await prisma.post.update({
+      where: { id: postId },
+      data: { isPinned: !post.isPinned },
+    });
+  } catch {
+    return { error: "고정 상태 변경 중 오류가 발생했습니다." };
+  }
 
   revalidatePath("/admin/posts");
   revalidatePath("/community");
@@ -77,16 +81,20 @@ export async function togglePostVisibility(postId: string) {
   const post = await prisma.post.findUnique({ where: { id: postId }, select: { isVisible: true } });
   if (!post) return { error: '게시글을 찾을 수 없습니다.' };
 
-  const updated = await prisma.post.update({
-    where: { id: postId },
-    data: { isVisible: !post.isVisible },
-    select: { isVisible: true },
-  });
+  try {
+    const updated = await prisma.post.update({
+      where: { id: postId },
+      data: { isVisible: !post.isVisible },
+      select: { isVisible: true },
+    });
 
-  revalidatePath('/admin/posts');
-  revalidatePath('/community');
-  revalidatePath('/');
-  return { isVisible: updated.isVisible };
+    revalidatePath('/admin/posts');
+    revalidatePath('/community');
+    revalidatePath('/');
+    return { isVisible: updated.isVisible };
+  } catch {
+    return { error: '노출 상태 변경 중 오류가 발생했습니다.' };
+  }
 }
 
 export async function adminDeletePost(postId: string) {
@@ -95,7 +103,11 @@ export async function adminDeletePost(postId: string) {
     return { error: "권한이 없습니다." };
   }
 
-  await prisma.post.delete({ where: { id: postId } });
+  try {
+    await prisma.post.delete({ where: { id: postId } });
+  } catch {
+    return { error: "게시글 삭제 중 오류가 발생했습니다." };
+  }
 
   revalidatePath("/admin/posts");
   revalidatePath("/community");

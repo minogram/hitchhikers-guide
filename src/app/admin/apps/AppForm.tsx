@@ -3,10 +3,15 @@
 import { useActionState, useState, useRef, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Sparkles, ImagePlus, Plus, ClipboardPaste, Eye } from "lucide-react";
 import type { AppFormState } from "@/app/actions/apps";
 import { addTagOption } from "@/app/actions/tags";
-import { RichTextEditor } from "@/components/RichTextEditor";
+
+const RichTextEditor = dynamic(
+  () => import("@/components/RichTextEditor").then((m) => m.RichTextEditor),
+  { ssr: false, loading: () => <div className="h-64 rounded-xl border border-border bg-card animate-pulse" /> }
+);
 
 interface AppFormProps {
   action: (prevState: AppFormState | undefined, formData: FormData) => Promise<AppFormState>;

@@ -22,6 +22,7 @@ export function LikeButton({ appId, initialLiked, initialCount, size = "md" }: L
     startTransition(async () => {
       try {
         const result = await toggleLike(appId);
+        if ("error" in result) return;
         setLiked(result.liked);
         setCount(result.likeCount);
       } catch {

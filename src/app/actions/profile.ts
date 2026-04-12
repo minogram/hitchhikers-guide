@@ -45,10 +45,14 @@ export async function updateProfile(
     }
   }
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { name, email },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { name, email },
+    });
+  } catch {
+    return { message: "프로필 업데이트 중 오류가 발생했습니다." };
+  }
 
   return { success: true, message: "프로필이 업데이트되었습니다." };
 }
@@ -106,10 +110,14 @@ export async function changePassword(
 
   const hashedPassword = await bcrypt.hash(validated.data.newPassword, 10);
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { password: hashedPassword },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { password: hashedPassword },
+    });
+  } catch {
+    return { message: "비밀번호 변경 중 오류가 발생했습니다." };
+  }
 
   return { success: true, message: "비밀번호가 변경되었습니다." };
 }
@@ -143,10 +151,14 @@ export async function saveApiKey(
 
   const encrypted = encrypt(apiKey);
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { geminiApiKey: encrypted },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { geminiApiKey: encrypted },
+    });
+  } catch {
+    return { message: "API 키 저장 중 오류가 발생했습니다." };
+  }
 
   return { success: true, message: "API 키가 안전하게 저장되었습니다." };
 }
@@ -207,10 +219,13 @@ export async function deleteAccount(
     return { errors: { password: ["비밀번호가 올바르지 않습니다."] } };
   }
 
-  // Delete user's comments, posts, then user
-  await prisma.comment.deleteMany({ where: { authorId: user.id } });
-  await prisma.post.deleteMany({ where: { authorId: user.id } });
-  await prisma.user.delete({ where: { id: user.id } });
+  try {
+    await prisma.comment.deleteMany({ where: { authorId: user.id } });
+    await prisma.post.deleteMany({ where: { authorId: user.id } });
+    await prisma.user.delete({ where: { id: user.id } });
+  } catch {
+    return { message: "계정 삭제 중 오류가 발생했습니다." };
+  }
 
   return { success: true, message: "계정이 삭제되었습니다." };
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { Menu, X, Sparkles, LogOut, Shield, UserCircle, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -16,6 +17,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
   const { resolvedTheme, setTheme } = useTheme();
+  const pathname = usePathname();
   const isAdmin = session?.user?.role === "admin";
   const isManager = session?.user?.role === "manager";
 
@@ -40,7 +42,11 @@ export function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm font-medium text-muted hover:text-foreground transition-colors"
+              className={`text-sm font-medium transition-colors ${
+                pathname.startsWith(item.href)
+                  ? "text-foreground"
+                  : "text-muted hover:text-foreground"
+              }`}
             >
               {item.name}
             </Link>
@@ -48,7 +54,11 @@ export function Header() {
           {(isAdmin || isManager) && (
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-foreground transition-colors"
+              className={`inline-flex items-center gap-1 text-sm font-medium transition-colors ${
+                pathname.startsWith("/admin")
+                  ? "text-foreground"
+                  : "text-accent hover:text-foreground"
+              }`}
             >
               <Shield className="h-3.5 w-3.5" />
               관리
@@ -113,6 +123,8 @@ export function Header() {
         <button
           className="md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-expanded={mobileMenuOpen}
+          aria-label="메뉴"
         >
           {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -126,7 +138,11 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="block text-sm font-medium text-muted hover:text-foreground"
+                className={`block text-sm font-medium ${
+                  pathname.startsWith(item.href)
+                    ? "text-foreground"
+                    : "text-muted hover:text-foreground"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
