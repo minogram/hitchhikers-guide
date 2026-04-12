@@ -6,14 +6,15 @@ import { Search, Trash2 } from "lucide-react";
 import { UserRoleSelect } from "./UserRoleSelect";
 import { deleteUser } from "@/app/actions/admin";
 import type { AdminUser } from "@/app/actions/admin";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export function AdminUserList({ users }: { users: AdminUser[] }) {
   const [query, setQuery] = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
 
   function handleDelete(user: AdminUser) {
-    if (!confirm(`정말 "${user.name}" 사용자를 삭제하시겠습니까?\n이 사용자의 게시글, 댓글, 앱이 모두 삭제됩니다.`)) return;
     startTransition(async () => {
       const result = await deleteUser(user.id);
       if (result.error) {
@@ -85,7 +86,7 @@ export function AdminUserList({ users }: { users: AdminUser[] }) {
                 <td className="px-6 py-4">
                   {user.role !== "admin" ? (
                     <button
-                      onClick={() => handleDelete(user)}
+                      onClick={() => setDeleteTarget(user)}
                       disabled={isPending}
                       className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
                       title="사용자 삭제"
@@ -108,6 +109,15 @@ export function AdminUserList({ users }: { users: AdminUser[] }) {
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="사용자 삭제"
+        description={deleteTarget ? `"정말 ${deleteTarget.name}" 사용자를 삭제하시겠습니까?\n이 사용자의 게시글, 댓글, 앱이 모두 삭제됩니다.` : ""}
+        confirmLabel="삭제"
+        onConfirm={() => { const u = deleteTarget; setDeleteTarget(null); if (u) handleDelete(u); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Search, Pin, Trash2, Eye, EyeOff, Pencil } from "lucide-react";
 import { togglePin, togglePostVisibility, adminDeletePost } from "@/app/actions/admin-posts";
 import type { AdminPost } from "@/app/actions/admin-posts";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 const typeLabel: Record<string, string> = {
   notice: "공지",
@@ -28,6 +29,7 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
   const [togglingPinId, setTogglingPinId] = useState<string | null>(null);
   const [pinError, setPinError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const filtered = posts.filter((post) => {
     const matchesType = typeFilter === "all" || post.type === typeFilter;
@@ -66,8 +68,7 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
     setTogglingVisibilityId(null);
   }
 
-  function handleDelete(postId: string, title: string) {
-    if (!confirm(`"${title}" 게시글을 삭제하시겠습니까?`)) return;
+  function handleDelete(postId: string) {
     startTransition(async () => {
       await adminDeletePost(postId);
     });
@@ -201,7 +202,7 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
                       <Pencil className="h-4 w-4" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(post.id, post.title)}
+                      onClick={() => setDeleteTarget({ id: post.id, title: post.title })}
                       disabled={isPending}
                       title="삭제"
                       className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
@@ -224,6 +225,15 @@ export function AdminPostList({ posts: initialPosts }: { posts: AdminPost[] }) {
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="게시글 삭제"
+        description={deleteTarget ? `"${deleteTarget.title}" 게시글을 삭제하시겠습니까?` : ""}
+        confirmLabel="삭제"
+        onConfirm={() => { const id = deleteTarget?.id; setDeleteTarget(null); if (id) handleDelete(id); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 }

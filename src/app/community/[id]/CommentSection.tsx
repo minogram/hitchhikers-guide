@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { createComment, deleteComment } from "@/app/actions/comments";
 import { User, Trash2, Clock } from "lucide-react";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 interface CommentData {
   id: string;
@@ -30,6 +31,7 @@ export function CommentSection({
   const [content, setContent] = useState("");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   function handleSubmit() {
     if (!content.trim()) return;
@@ -45,7 +47,6 @@ export function CommentSection({
   }
 
   function handleDelete(commentId: string) {
-    if (!confirm("댓글을 삭제하시겠습니까?")) return;
     startTransition(async () => {
       const result = await deleteComment(commentId);
       if (result.error) {
@@ -111,7 +112,7 @@ export function CommentSection({
                 </div>
                 {canDelete && (
                   <button
-                    onClick={() => handleDelete(comment.id)}
+                    onClick={() => setDeleteTarget(comment.id)}
                     disabled={isPending}
                     className="text-muted hover:text-red-500 transition-colors disabled:opacity-50"
                     title="삭제"
@@ -133,6 +134,15 @@ export function CommentSection({
           아직 댓글이 없습니다. 첫 댓글을 작성해보세요!
         </p>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="댓글 삭제"
+        description="댓글을 삭제하시겠습니까?"
+        confirmLabel="삭제"
+        onConfirm={() => { const id = deleteTarget; setDeleteTarget(null); if (id) handleDelete(id); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </section>
   );
 }

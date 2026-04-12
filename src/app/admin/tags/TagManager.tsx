@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Plus, Pencil, Trash2, Check, X, ChevronUp, ChevronDown } from "lucide-react";
 import { addTagOption, updateTagOption, deleteTagOption, reorderTagOption } from "@/app/actions/tags";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 interface TagItem {
   id: string;
@@ -59,6 +60,7 @@ function TagGroup({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null);
 
   function handleAdd() {
     const trimmed = newTag.trim();
@@ -103,15 +105,20 @@ function TagGroup({
   }
 
   function handleDelete(id: string, label: string) {
-    if (!confirm(`"${label}" 태그를 삭제하시겠습니까?\n이 태그가 사용된 앱에서도 제거됩니다.`)) return;
+    setDeleteTarget({ id, label });
+  }
+
+  function executeDelete() {
+    if (!deleteTarget) return;
     onError(null);
     startTransition(async () => {
-      const result = await deleteTagOption(id);
+      const result = await deleteTagOption(deleteTarget.id);
       if (result.error) {
         onError(result.error);
       } else {
-        onUpdate(items.filter((t) => t.id !== id));
+        onUpdate(items.filter((t) => t.id !== deleteTarget.id));
       }
+      setDeleteTarget(null);
     });
   }
 
@@ -242,6 +249,15 @@ function TagGroup({
           추가
         </button>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="태그 삭제"
+        description={deleteTarget ? `"${deleteTarget.label}" 태그를 삭제하시겠습니까?\n이 태그가 사용된 앱에서도 제거됩니다.` : ""}
+        confirmLabel="삭제"
+        onConfirm={executeDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
