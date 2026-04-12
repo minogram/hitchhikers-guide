@@ -42,7 +42,7 @@ export async function createApp(
   const session = await requireAdminOrManager();
   if (!session) return { message: "권한이 없습니다." };
 
-  const tags = JSON.stringify(formData.getAll("tagsChecked"));
+  const tags = JSON.stringify([...new Set(formData.getAll("tagsChecked"))]);
 
   const validatedFields = AppFormSchema.safeParse({
     title: formData.get("title"),
@@ -91,7 +91,7 @@ export async function updateApp(
   const session = await requireAdminOrManager();
   if (!session) return { message: "권한이 없습니다." };
 
-  const tags = JSON.stringify(formData.getAll("tagsChecked"));
+  const tags = JSON.stringify([...new Set(formData.getAll("tagsChecked"))]);
 
   const validatedFields = AppFormSchema.safeParse({
     title: formData.get("title"),

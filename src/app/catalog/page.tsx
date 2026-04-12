@@ -283,7 +283,7 @@ function CatalogContent() {
             <div className="space-y-1.5">
               {app.industryTags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
-                  {app.industryTags.map((tag) => (
+                  {[...new Set(app.industryTags)].map((tag) => (
                     <span
                       key={tag}
                       className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
@@ -295,7 +295,7 @@ function CatalogContent() {
               )}
               {app.processTags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
-                  {app.processTags.map((tag) => (
+                  {[...new Set(app.processTags)].map((tag) => (
                     <span
                       key={tag}
                       className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium text-muted"

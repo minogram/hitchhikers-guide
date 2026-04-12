@@ -141,6 +141,36 @@ export async function deleteTagOption(id: string) {
   return { success: true };
 }
 
+export async function removeDuplicateTagsFromApps() {
+  const session = await requireAdminOrManager();
+  if (!session) return { error: "권한이 없습니다." };
+
+  try {
+    const apps = await prisma.appCard.findMany({
+      select: { id: true, tags: true },
+    });
+
+    let updatedCount = 0;
+    for (const app of apps) {
+      const tags: string[] = JSON.parse(app.tags);
+      const unique = [...new Set(tags)];
+      if (unique.length < tags.length) {
+        await prisma.appCard.update({
+          where: { id: app.id },
+          data: { tags: JSON.stringify(unique) },
+        });
+        updatedCount++;
+      }
+    }
+
+    revalidatePath("/catalog");
+    revalidatePath("/admin/apps");
+    return { success: true, updatedCount };
+  } catch {
+    return { error: "중복 태그 제거 중 오류가 발생했습니다." };
+  }
+}
+
 export async function reorderTagOption(id: string, direction: "up" | "down") {
   const idResult = cuidSchema.safeParse(id);
   if (!idResult.success) return { error: "유효하지 않은 태그 ID입니다." };

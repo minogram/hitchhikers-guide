@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Plus, Pencil, Trash2, Check, X, ChevronUp, ChevronDown } from "lucide-react";
-import { addTagOption, updateTagOption, deleteTagOption, reorderTagOption } from "@/app/actions/tags";
+import { Plus, Pencil, Trash2, Check, X, ChevronUp, ChevronDown, Copy } from "lucide-react";
+import { addTagOption, updateTagOption, deleteTagOption, reorderTagOption, removeDuplicateTagsFromApps } from "@/app/actions/tags";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 interface TagItem {
@@ -17,6 +17,25 @@ interface TagManagerProps {
 export function TagManager({ initialTags }: TagManagerProps) {
   const [tags, setTags] = useState(initialTags);
   const [error, setError] = useState<string | null>(null);
+  const [dedupResult, setDedupResult] = useState<string | null>(null);
+  const [isDedupPending, startDedupTransition] = useTransition();
+
+  function handleRemoveDuplicates() {
+    setError(null);
+    setDedupResult(null);
+    startDedupTransition(async () => {
+      const result = await removeDuplicateTagsFromApps();
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setDedupResult(
+          result.updatedCount! > 0
+            ? `${result.updatedCount}개 앱에서 중복 태그를 제거했습니다.`
+            : "중복 태그가 없습니다."
+        );
+      }
+    });
+  }
 
   return (
     <div className="space-y-8">
@@ -25,6 +44,22 @@ export function TagManager({ initialTags }: TagManagerProps) {
           {error}
         </div>
       )}
+      {dedupResult && (
+        <div className="rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-500">
+          {dedupResult}
+        </div>
+      )}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={handleRemoveDuplicates}
+          disabled={isDedupPending}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-2.5 text-sm font-medium hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
+        >
+          <Copy className="h-4 w-4" />
+          {isDedupPending ? "처리 중..." : "앱 중복 태그 제거"}
+        </button>
+      </div>
       <TagGroup
         title="Industry"
         group="industry"
