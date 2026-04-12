@@ -14,19 +14,23 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const app = await prisma.appCard.findUnique({ where: { id } });
-  if (!app) return { title: "앱을 찾을 수 없습니다" };
+  try {
+    const { id } = await params;
+    const app = await prisma.appCard.findUnique({ where: { id } });
+    if (!app) return { title: "앱을 찾을 수 없습니다" };
 
-  return {
-    title: `${app.title} | Hitchhiker's Guide`,
-    description: app.description,
-    openGraph: {
-      title: app.title,
+    return {
+      title: `${app.title} | Hitchhiker's Guide`,
       description: app.description,
-      ...(app.thumbnail ? { images: [{ url: app.thumbnail }] } : {}),
-    },
-  };
+      openGraph: {
+        title: app.title,
+        description: app.description,
+        ...(app.thumbnail ? { images: [{ url: app.thumbnail }] } : {}),
+      },
+    };
+  } catch {
+    return { title: "Hitchhiker's Guide to Fashion AI" };
+  }
 }
 
 export default async function AppDetailPage({ params }: Props) {

@@ -20,23 +20,27 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const post = await prisma.post.findUnique({
-    where: { id },
-    select: { title: true, content: true, type: true },
-  });
-  if (!post) return { title: "게시글을 찾을 수 없습니다" };
+  try {
+    const { id } = await params;
+    const post = await prisma.post.findUnique({
+      where: { id },
+      select: { title: true, content: true, type: true },
+    });
+    if (!post) return { title: "게시글을 찾을 수 없습니다" };
 
-  const plainContent = post.content.replace(/<[^>]*>/g, "").slice(0, 160);
+    const plainContent = post.content.replace(/<[^>]*>/g, "").slice(0, 160);
 
-  return {
-    title: `${post.title} | 커뮤니티`,
-    description: plainContent,
-    openGraph: {
-      title: post.title,
+    return {
+      title: `${post.title} | 커뮤니티`,
       description: plainContent,
-    },
-  };
+      openGraph: {
+        title: post.title,
+        description: plainContent,
+      },
+    };
+  } catch {
+    return { title: "커뮤니티 | Hitchhiker's Guide" };
+  }
 }
 
 export default async function PostDetailPage({ params }: Props) {
