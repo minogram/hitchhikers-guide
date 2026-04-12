@@ -4,6 +4,7 @@ import { ArrowRight, Zap, Users, BookOpen, Bell } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LikeButton } from "@/components/LikeButton";
+import { HeroSlider } from "@/components/HeroSlider";
 
 export default async function Home() {
   const session = await auth().catch(() => null);
@@ -42,50 +43,7 @@ export default async function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-40">
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium text-accent uppercase tracking-widest mb-4">
-              Curating · Connecting · Creating
-            </p>
-            <h1 className="font-serif text-5xl font-black leading-tight tracking-tight sm:text-7xl">
-              The Hitchhiker&apos;s
-              <br />
-              <span className="text-accent">Guide</span> to
-              <br />
-              Fashion AI
-            </h1>
-            <p className="mt-8 text-lg leading-relaxed text-muted max-w-lg">
-              패션 산업에 특화된 AI 도구를 탐색하고, 전문가들과 연결되며,
-              새로운 기술적 가치를 함께 창조하세요.
-            </p>
-            <div className="mt-10 flex items-center gap-4">
-              <Link
-                href="/catalog"
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
-              >
-                앱 탐색
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              {!session?.user && (
-                <Link
-                  href="/register"
-                  className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold hover:bg-card-hover transition-colors"
-                >
-                  무료 가입
-                </Link>
-              )}
-            </div>
-          </div>
-
-          {/* Decorative element */}
-          <div className="absolute -top-20 right-0 hidden lg:block opacity-10">
-            <div className="text-[20rem] font-serif font-black text-foreground leading-none select-none">
-              AI
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSlider isLoggedIn={!!session?.user} />
 
       {/* Pinned Notices Section */}
       {pinnedNotices.length > 0 && (
