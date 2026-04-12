@@ -36,7 +36,7 @@ export default async function AdminPage() {
             className="rounded-2xl border border-border bg-card p-6 hover:bg-card-hover transition-colors"
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl">
                 <stat.icon className="h-5 w-5 text-accent" />
               </div>
             </div>
