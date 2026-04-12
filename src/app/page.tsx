@@ -315,7 +315,7 @@ export default async function Home() {
             패션의 미래를 함께 만들어가요
           </h2>
           <p className="text-background/60 mb-8 max-w-md mx-auto">
-            지금 가입하고 패션 AI의 최전선에서 활동하는 커뮤니티에 참여하세요.
+            패션 AI 커뮤니티에 참여하고 새로운 가능성을 발견하세요.
           </p>
           <Link
             href="/register"
