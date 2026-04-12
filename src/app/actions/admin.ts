@@ -3,8 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { cuidSchema } from "@/lib/definitions";
 
 export async function updateUserRole(userId: string, newRole: string) {
+  const idResult = cuidSchema.safeParse(userId);
+  if (!idResult.success) return { error: "유효하지 않은 사용자 ID입니다." };
+
   const session = await auth();
   if (!session?.user || session.user.role !== "admin") {
     return { error: "권한이 없습니다." };
@@ -59,6 +63,9 @@ export async function getUsers(): Promise<AdminUser[]> {
 }
 
 export async function deleteUser(userId: string) {
+  const idResult = cuidSchema.safeParse(userId);
+  if (!idResult.success) return { error: "유효하지 않은 사용자 ID입니다." };
+
   const session = await auth();
   if (!session?.user || session.user.role !== "admin") {
     return { error: "권한이 없습니다." };

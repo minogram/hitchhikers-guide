@@ -3,8 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { cuidSchema } from "@/lib/definitions";
 
 export async function toggleLike(appId: string): Promise<{ liked: boolean; likeCount: number } | { error: string }> {
+  const idResult = cuidSchema.safeParse(appId);
+  if (!idResult.success) return { error: "유효하지 않은 앱 ID입니다." };
+
   const session = await auth();
   if (!session?.user?.id) {
     return { error: "로그인이 필요합니다." };

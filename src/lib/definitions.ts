@@ -1,5 +1,8 @@
 import * as z from "zod";
 
+// CUID validation for entity IDs
+export const cuidSchema = z.string().min(1).max(30).regex(/^c[a-z0-9]+$/, "유효하지 않은 ID입니다.");
+
 export const SignupFormSchema = z.object({
   name: z
     .string()

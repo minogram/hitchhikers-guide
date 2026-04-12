@@ -3,8 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { cuidSchema } from "@/lib/definitions";
 
 export async function createComment(postId: string, content: string) {
+  const idResult = cuidSchema.safeParse(postId);
+  if (!idResult.success) return { error: "유효하지 않은 게시글 ID입니다." };
+
   const session = await auth();
   if (!session?.user) {
     return { error: "로그인이 필요합니다." };
@@ -40,6 +44,9 @@ export async function createComment(postId: string, content: string) {
 }
 
 export async function deleteComment(commentId: string) {
+  const idResult = cuidSchema.safeParse(commentId);
+  if (!idResult.success) return { error: "유효하지 않은 댓글 ID입니다." };
+
   const session = await auth();
   if (!session?.user) {
     return { error: "로그인이 필요합니다." };

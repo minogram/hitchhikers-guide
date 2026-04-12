@@ -53,9 +53,9 @@
 - [ ] **암호화 시크릿 하드코딩 제거** — `src/lib/crypto.ts`에서 `ENCRYPTION_SECRET` 환경변수 미설정 시 하드코딩된 기본값 사용. 프로덕션에서 반드시 에러를 던지도록 수정
 - [x] **서버 액션 에러 핸들링** — `src/app/actions/` 전체 파일에서 DB 작업에 try-catch 없음. DB 오류 시 앱 크래시 발생
 - [x] **toggleLike throw 대신 return** — `src/app/actions/likes.ts`에서 `throw new Error`로 처리 중. `return { error }` 패턴으로 통일
-- [ ] **ID 입력값 검증** — 서버 액션에서 받는 ID 파라미터에 Zod 등으로 CUID 검증 없음 (comments, posts, admin, apps)
-- [ ] **bulk 작업 입력 제한** — `bulkSetAppVisibility`에 배열 크기 제한 없음. DoS 위험
-- [ ] **XSS 방어 점검** — 게시글/댓글 저장 시 HTML 콘텐츠 미살균. SafeHtml 컴포넌트의 살균 수준 검토 필요
+- [x] **ID 입력값 검증** — 서버 액션에서 받는 ID 파라미터에 Zod 등으로 CUID 검증 없음 (comments, posts, admin, apps)
+- [x] **bulk 작업 입력 제한** — `bulkSetAppVisibility`에 배열 크기 제한 없음. DoS 위험
+- [x] **XSS 방어 점검** — 게시글/댓글 저장 시 HTML 콘텐츠 미살균. SafeHtml 컴포넌트의 살균 수준 검토 필요
 - [ ] **보안 응답 헤더 추가** — Next.js middleware에서 `X-Content-Type-Options`, `X-Frame-Options`, CSP 등 헤더 설정
 
 #### 7-2. 🟠 버그 및 안정성
@@ -64,8 +64,8 @@
 - [x] **댓글 작성 시 게시글 존재 확인** — `createComment()`에서 해당 게시글의 존재 여부를 확인하지 않음
 - [x] **좋아요 토글 시 앱 존재 확인** — `toggleLike()`에서 해당 앱의 존재 여부를 확인하지 않음
 - [x] **이메일 중복 검사 레이스 컨디션** — `auth.ts` 회원가입에서 중복 체크와 생성 사이에 타이밍 이슈 가능. DB 유니크 제약조건 에러 핸들링 필요
-- [ ] **Cloudinary 삭제 실패 무시** — 앱 수정/삭제 시 Cloudinary 이미지 삭제 실패가 완전히 무시됨. 최소 로깅 필요
-- [ ] **태그 업데이트 부분 실패** — `tags.ts`에서 여러 앱의 태그를 업데이트할 때 트랜잭션 없이 진행. 부분 실패 가능
+- [x] **Cloudinary 삭제 실패 무시** — 앱 수정/삭제 시 Cloudinary 이미지 삭제 실패가 완전히 무시됨. 최소 로깅 필요
+- [x] **태그 업데이트 부분 실패** — `tags.ts`에서 여러 앱의 태그를 업데이트할 때 트랜잭션 없이 진행. 부분 실패 가능
 
 #### 7-3. 🟡 SEO 및 메타데이터
 

@@ -119,7 +119,9 @@ export async function updateApp(
     if (existing?.thumbnail && existing.thumbnail !== thumbnailUrl) {
       const match = existing.thumbnail.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
       if (match) {
-        await cloudinary.uploader.destroy(match[1]).catch(() => null);
+        await cloudinary.uploader.destroy(match[1]).catch((err: unknown) => {
+          console.error("Cloudinary delete failed (update):", err);
+        });
       }
     }
   }
@@ -156,7 +158,9 @@ export async function deleteApp(appId: string) {
     // URL에서 public_id 추출: .../upload/v123456/{public_id}.ext
     const match = app.thumbnail.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
     if (match) {
-      await cloudinary.uploader.destroy(match[1]).catch(() => null);
+      await cloudinary.uploader.destroy(match[1]).catch((err: unknown) => {
+        console.error("Cloudinary delete failed (delete):", err);
+      });
     }
   }
 
@@ -228,6 +232,7 @@ export async function bulkSetAppVisibility(
   const session = await requireAdminOrManager();
   if (!session) return { error: "권한이 없습니다." };
   if (!appIds.length) return { error: "선택된 앱이 없습니다." };
+  if (appIds.length > 100) return { error: "한 번에 최대 100개까지 처리할 수 있습니다." };
 
   await prisma.appCard.updateMany({
     where: { id: { in: appIds } },

@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { cuidSchema } from "@/lib/definitions";
 
 async function requireAdminOrManager() {
   const session = await auth();
@@ -60,6 +61,9 @@ export async function addTagOption(label: string, group: "industry" | "process" 
 }
 
 export async function updateTagOption(id: string, newLabel: string) {
+  const idResult = cuidSchema.safeParse(id);
+  if (!idResult.success) return { error: "유효하지 않은 태그 ID입니다." };
+
   const session = await requireAdminOrManager();
   if (!session) return { error: "권한이 없습니다." };
 
@@ -73,23 +77,25 @@ export async function updateTagOption(id: string, newLabel: string) {
   if (oldLabel === trimmed) return { success: true };
 
   try {
-    await prisma.tagOption.update({ where: { id }, data: { label: trimmed } });
-  } catch {
-    return { error: "이미 존재하는 태그입니다." };
-  }
+    await prisma.$transaction(async (tx) => {
+      await tx.tagOption.update({ where: { id }, data: { label: trimmed } });
 
-  // Update all AppCards that reference the old tag label
-  const apps = await prisma.appCard.findMany({
-    where: { tags: { contains: oldLabel } },
-    select: { id: true, tags: true },
-  });
-  for (const app of apps) {
-    const tags: string[] = JSON.parse(app.tags);
-    const idx = tags.indexOf(oldLabel);
-    if (idx !== -1) {
-      tags[idx] = trimmed;
-      await prisma.appCard.update({ where: { id: app.id }, data: { tags: JSON.stringify(tags) } });
-    }
+      // Update all AppCards that reference the old tag label
+      const apps = await tx.appCard.findMany({
+        where: { tags: { contains: oldLabel } },
+        select: { id: true, tags: true },
+      });
+      for (const app of apps) {
+        const tags: string[] = JSON.parse(app.tags);
+        const idx = tags.indexOf(oldLabel);
+        if (idx !== -1) {
+          tags[idx] = trimmed;
+          await tx.appCard.update({ where: { id: app.id }, data: { tags: JSON.stringify(tags) } });
+        }
+      }
+    });
+  } catch {
+    return { error: "태그 업데이트 중 오류가 발생했습니다." };
   }
 
   revalidatePath("/admin/tags");
@@ -99,6 +105,9 @@ export async function updateTagOption(id: string, newLabel: string) {
 }
 
 export async function deleteTagOption(id: string) {
+  const idResult = cuidSchema.safeParse(id);
+  if (!idResult.success) return { error: "유효하지 않은 태그 ID입니다." };
+
   const session = await requireAdminOrManager();
   if (!session) return { error: "권한이 없습니다." };
 
@@ -107,17 +116,23 @@ export async function deleteTagOption(id: string) {
 
   const label = existing.label;
 
-  await prisma.tagOption.delete({ where: { id } });
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.tagOption.delete({ where: { id } });
 
-  // Remove the tag from all AppCards that reference it
-  const apps = await prisma.appCard.findMany({
-    where: { tags: { contains: label } },
-    select: { id: true, tags: true },
-  });
-  for (const app of apps) {
-    const tags: string[] = JSON.parse(app.tags);
-    const filtered = tags.filter((t) => t !== label);
-    await prisma.appCard.update({ where: { id: app.id }, data: { tags: JSON.stringify(filtered) } });
+      // Remove the tag from all AppCards that reference it
+      const apps = await tx.appCard.findMany({
+        where: { tags: { contains: label } },
+        select: { id: true, tags: true },
+      });
+      for (const app of apps) {
+        const tags: string[] = JSON.parse(app.tags);
+        const filtered = tags.filter((t) => t !== label);
+        await tx.appCard.update({ where: { id: app.id }, data: { tags: JSON.stringify(filtered) } });
+      }
+    });
+  } catch {
+    return { error: "태그 삭제 중 오류가 발생했습니다." };
   }
 
   revalidatePath("/admin/tags");
@@ -127,6 +142,9 @@ export async function deleteTagOption(id: string) {
 }
 
 export async function reorderTagOption(id: string, direction: "up" | "down") {
+  const idResult = cuidSchema.safeParse(id);
+  if (!idResult.success) return { error: "유효하지 않은 태그 ID입니다." };
+
   const session = await requireAdminOrManager();
   if (!session) return { error: "권한이 없습니다." };
 
