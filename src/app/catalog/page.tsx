@@ -43,9 +43,7 @@ function CatalogContent() {
   );
   const [industryTags, setIndustryTags] = useState<string[]>([]);
   const [processTags, setProcessTags] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(() => {
-    return !!(searchParams.get("industry") || searchParams.get("process"));
-  });
+  const [showFilters, setShowFilters] = useState(true);
   const [visibleCount, setVisibleCount] = useState(12);
   const PAGE_SIZE = 12;
 
