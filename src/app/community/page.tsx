@@ -184,8 +184,17 @@ export default function CommunityPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-20">
-          <p className="text-muted">로딩 중...</p>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="rounded-xl border border-border bg-card p-5 animate-pulse">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-5 w-12 rounded-full bg-muted/20" />
+                <div className="h-4 w-24 rounded bg-muted/20" />
+              </div>
+              <div className="h-5 w-3/4 rounded bg-muted/20 mb-2" />
+              <div className="h-4 w-full rounded bg-muted/20" />
+            </div>
+          ))}
         </div>
       ) : filteredPosts.length === 0 ? (
         <div className="text-center py-20">

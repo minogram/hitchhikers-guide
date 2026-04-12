@@ -229,6 +229,22 @@ function CatalogContent() {
       </p>
 
       {/* App Grid */}
+      {loading ? (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-2xl border border-border bg-card p-6 animate-pulse">
+              <div className="aspect-[4/3] rounded-xl bg-muted/20 mb-4" />
+              <div className="h-5 w-3/4 rounded bg-muted/20 mb-2" />
+              <div className="h-4 w-full rounded bg-muted/20 mb-1" />
+              <div className="h-4 w-2/3 rounded bg-muted/20 mb-3" />
+              <div className="flex gap-2">
+                <div className="h-6 w-16 rounded-full bg-muted/20" />
+                <div className="h-6 w-16 rounded-full bg-muted/20" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {visibleApps.map((app) => (
           <Link
@@ -295,6 +311,7 @@ function CatalogContent() {
           </Link>
         ))}
       </div>
+      )}
 
       {filteredApps.length === 0 && !loading && (
         <div className="text-center py-20">

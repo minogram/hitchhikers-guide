@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { DeletePostButton } from "./DeletePostButton";
 import { CommentSection } from "./CommentSection";
 import { SafeHtml } from "@/components/SafeHtml";
+import type { Metadata } from "next";
 
 const typeLabel: Record<string, string> = {
   notice: "공지사항",
@@ -16,6 +17,26 @@ const typeLabel: Record<string, string> = {
 
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const post = await prisma.post.findUnique({
+    where: { id },
+    select: { title: true, content: true, type: true },
+  });
+  if (!post) return { title: "게시글을 찾을 수 없습니다" };
+
+  const plainContent = post.content.replace(/<[^>]*>/g, "").slice(0, 160);
+
+  return {
+    title: `${post.title} | 커뮤니티`,
+    description: plainContent,
+    openGraph: {
+      title: post.title,
+      description: plainContent,
+    },
+  };
 }
 
 export default async function PostDetailPage({ params }: Props) {

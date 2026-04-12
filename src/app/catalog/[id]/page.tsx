@@ -7,9 +7,26 @@ import { auth } from "@/lib/auth";
 import { LikeButton } from "@/components/LikeButton";
 import { BackToCatalog } from "./BackToCatalog";
 import { SafeHtml } from "@/components/SafeHtml";
+import type { Metadata } from "next";
 
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const app = await prisma.appCard.findUnique({ where: { id } });
+  if (!app) return { title: "앱을 찾을 수 없습니다" };
+
+  return {
+    title: `${app.title} | Hitchhiker's Guide`,
+    description: app.description,
+    openGraph: {
+      title: app.title,
+      description: app.description,
+      ...(app.thumbnail ? { images: [{ url: app.thumbnail }] } : {}),
+    },
+  };
 }
 
 export default async function AppDetailPage({ params }: Props) {
