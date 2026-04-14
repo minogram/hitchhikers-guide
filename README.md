@@ -108,6 +108,12 @@ npm run db:reset     # DB 초기화
 
 ---
 
+## 도메인 관리
+
+gabia.com 386com : ***1@@tls
+
+---
+
 ## 앱 JSON Import 형식
 
 관리자 → 앱 목록 → **JSON Import**로 일괄 등록:
