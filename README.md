@@ -50,28 +50,64 @@
 
 ---
 
-## 로컬 개발
+## Environment
+
+프로젝트 루트에 `.env.local` 파일을 직접 만들고 아래 값을 채워주세요.
+
+### 환경변수 예시
+
+```env
+DATABASE_URL=libsql://your-db.turso.io
+DATABASE_AUTH_TOKEN=your-turso-auth-token
+AUTH_SECRET=your-auth-secret
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+ENCRYPTION_SECRET=your-encryption-secret
+```
+
+### 메모
+
+- `AUTH_SECRET`, `ENCRYPTION_SECRET`은 `openssl rand -base64 32`로 생성하는 것을 권장합니다.
+- Turso 대신 로컬 SQLite를 사용할 경우 `DATABASE_URL=file:./dev.db` 형태로 지정할 수 있습니다.
+- 이미지 업로드 기능을 쓰려면 Cloudinary 환경변수가 필요합니다.
+
+---
+
+## Local Run
+
+### 1. 의존성 설치
 
 ```bash
 git clone https://github.com/minogram/hitchhikers-guide.git
 cd hitchhikers-guide
 npm install
-cp .env.local.example .env.local   # 환경변수 편집
-npx prisma db push
-npx prisma db seed
-npm run dev                         # http://localhost:3000
 ```
 
-### 환경변수 (`.env.local`)
+### 2. 데이터베이스 준비
 
-```env
-DATABASE_URL=libsql://your-db.turso.io
-DATABASE_AUTH_TOKEN=your-turso-auth-token
-AUTH_SECRET=          # openssl rand -base64 32
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-ENCRYPTION_SECRET=    # openssl rand -base64 32
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+### 3. 개발 서버 실행
+
+```bash
+npm run dev
+```
+
+브라우저에서 `http://localhost:3000`으로 접속하면 됩니다.
+
+### 자주 쓰는 로컬 명령
+
+```bash
+npm run dev
+npm run restart
+npm run lint
+npm run db:migrate
+npm run db:seed
+npm run db:reset
 ```
 
 ### Seed 계정
@@ -82,29 +118,55 @@ ENCRYPTION_SECRET=    # openssl rand -base64 32
 | Manager | manager1@falab.kr | pass.manager1 |
 | User | user1@falab.kr | pass.user1 |
 
-### NPM Scripts
+---
+
+## Build
+
+프로덕션 빌드는 아래 명령으로 수행합니다.
 
 ```bash
-npm run dev          # 개발 서버
-npm run build        # 프로덕션 빌드
-npm run lint         # ESLint
-npm run db:migrate   # Prisma 마이그레이션
-npm run db:seed      # 초기 데이터 시딩
-npm run db:reset     # DB 초기화
+npm run build
 ```
+
+현재 `build` 스크립트는 아래 순서로 실행됩니다.
+
+```bash
+prisma generate && next build
+```
+
+로컬에서 프로덕션 모드까지 확인하려면 아래 순서로 실행하면 됩니다.
+
+```bash
+npm run build
+npm run start
+```
+
+기본 실행 주소는 `http://localhost:3000`입니다.
 
 ---
 
-## Vercel 배포
+## Deploy
+
+현재 README 기준 권장 배포 대상은 Vercel입니다.
+
+### Vercel 배포 순서
 
 1. GitHub repo 연결 → 자동 배포
-2. **Settings → Environment Variables**에 위 환경변수 등록
-3. Turso DB 생성:
+2. Vercel Project Settings → Environment Variables에 `.env.local`과 동일한 값을 등록
+3. 프로덕션 DB로 Turso를 사용할 경우 데이터베이스와 토큰을 생성
    ```bash
    turso db create hitchhikers-guide
    turso db show hitchhikers-guide --url
    turso db tokens create hitchhikers-guide
    ```
+4. `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `AUTH_SECRET`, `CLOUDINARY_*`, `ENCRYPTION_SECRET` 값을 Vercel에 반영
+5. 배포 후 `/login`, `/catalog`, `/admin` 등 주요 화면과 이미지 업로드를 점검
+
+### 배포 체크포인트
+
+- 프로덕션에서는 SQLite 파일 대신 Turso 사용을 권장합니다.
+- Cloudinary 환경변수가 없으면 업로드 API가 실패합니다.
+- 인증이 정상 동작하려면 `AUTH_SECRET`이 배포 환경에도 반드시 동일하게 설정되어야 합니다.
 
 ---
 
