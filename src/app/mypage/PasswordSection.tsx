@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useActionState } from "react";
 import { changePassword } from "@/app/actions/profile";
 import { Lock, Check } from "lucide-react";
+import { PasswordRequirementList } from "@/components/PasswordRequirementList";
 
 export function PasswordSection() {
   const [state, action, pending] = useActionState(changePassword, undefined);
+  const [newPassword, setNewPassword] = useState("");
 
   return (
     <section className="rounded-2xl border border-border bg-card p-6">
@@ -50,10 +53,13 @@ export function PasswordSection() {
               name="newPassword"
               type="password"
               required
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
               placeholder="8자 이상, 영문+숫자"
               className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
             />
           </div>
+          <PasswordRequirementList password={newPassword} />
           {state?.errors?.newPassword && (
             <ul className="mt-1 text-xs text-accent space-y-0.5">
               {state.errors.newPassword.map((err) => (

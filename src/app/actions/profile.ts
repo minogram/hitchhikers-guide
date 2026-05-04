@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { encrypt } from "@/lib/crypto";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { EmailSchema, PasswordSchema } from "@/lib/definitions";
 
 export type ProfileFormState = {
   errors?: Record<string, string[]>;
@@ -14,7 +15,7 @@ export type ProfileFormState = {
 
 const UpdateProfileSchema = z.object({
   name: z.string().min(2, "이름은 2자 이상이어야 합니다.").trim(),
-  email: z.string().email("올바른 이메일을 입력해주세요.").trim(),
+  email: EmailSchema,
 });
 
 export async function updateProfile(
@@ -60,11 +61,7 @@ export async function updateProfile(
 const ChangePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "현재 비밀번호를 입력해주세요."),
-    newPassword: z
-      .string()
-      .min(8, "비밀번호는 8자 이상이어야 합니다.")
-      .regex(/[a-zA-Z]/, "영문자를 1자 이상 포함해야 합니다.")
-      .regex(/[0-9]/, "숫자를 1자 이상 포함해야 합니다."),
+    newPassword: PasswordSchema,
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {

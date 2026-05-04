@@ -3,13 +3,22 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Mail, Lock, User, ArrowRight, CheckCircle } from "lucide-react";
 import { signup } from "@/app/actions/auth";
+import { PasswordRequirementList } from "@/components/PasswordRequirementList";
+
+type EmailCheckStatus = "idle" | "invalid" | "checking" | "available" | "taken" | "error";
 
 export default function RegisterPage() {
   const [state, action, pending] = useActionState(signup, undefined);
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [emailCheckStatus, setEmailCheckStatus] = useState<EmailCheckStatus>("idle");
+  const [emailCheckMessage, setEmailCheckMessage] = useState("");
+  const [password, setPassword] = useState("");
+
+  const normalizedEmail = useMemo(() => email.trim(), [email]);
 
   useEffect(() => {
     if (state?.success) {
@@ -17,6 +26,72 @@ export default function RegisterPage() {
       return () => clearTimeout(timer);
     }
   }, [state?.success, router]);
+
+  useEffect(() => {
+    if (!normalizedEmail) {
+      setEmailCheckStatus("idle");
+      setEmailCheckMessage("");
+      return;
+    }
+
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+    if (!isValidEmail) {
+      setEmailCheckStatus("invalid");
+      setEmailCheckMessage("올바른 이메일 형식이 아닙니다.");
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setEmailCheckStatus("checking");
+      setEmailCheckMessage("이메일 확인 중...");
+
+      try {
+        const response = await fetch(
+          `/api/auth/check-email?email=${encodeURIComponent(normalizedEmail)}`,
+          { signal: controller.signal }
+        );
+        const data = (await response.json()) as {
+          available?: boolean;
+          message?: string;
+        };
+
+        if (!response.ok) {
+          setEmailCheckStatus("error");
+          setEmailCheckMessage(data.message ?? "이메일 확인 중 오류가 발생했습니다.");
+          return;
+        }
+
+        setEmailCheckStatus(data.available ? "available" : "taken");
+        setEmailCheckMessage(
+          data.message ??
+            (data.available ? "사용 가능한 이메일입니다." : "이미 사용 중인 이메일입니다.")
+        );
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setEmailCheckStatus("error");
+        setEmailCheckMessage("이메일 확인 중 오류가 발생했습니다.");
+      }
+    }, 350);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [normalizedEmail]);
+
+  const showEmailHelper =
+    normalizedEmail.length > 0 && (!state?.errors?.email || normalizedEmail !== state.errors.email[0]);
+
+  const emailHelperClassName =
+    emailCheckStatus === "available"
+      ? "text-green-600"
+      : emailCheckStatus === "taken" || emailCheckStatus === "invalid" || emailCheckStatus === "error"
+        ? "text-accent"
+        : "text-muted";
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -69,12 +144,17 @@ export default function RegisterPage() {
                   name="email"
                   type="email"
                   required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   placeholder="you@example.com"
                   className="w-full rounded-xl border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
                 />
               </div>
               {state?.errors?.email && (
                 <p className="mt-1 text-xs text-accent">{state.errors.email[0]}</p>
+              )}
+              {!state?.errors?.email && showEmailHelper && (
+                <p className={`mt-1 text-xs ${emailHelperClassName}`}>{emailCheckMessage}</p>
               )}
             </div>
 
@@ -90,10 +170,13 @@ export default function RegisterPage() {
                   type="password"
                   required
                   minLength={8}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                   placeholder="8자 이상 (영문+숫자 포함)"
                   className="w-full rounded-xl border border-border bg-card pl-11 pr-4 py-3 text-sm outline-none focus:border-accent transition-colors placeholder:text-muted"
                 />
               </div>
+              <PasswordRequirementList password={password} />
               {state?.errors?.password && (
                 <ul className="mt-1 text-xs text-accent space-y-0.5">
                   {state.errors.password.map((err) => (
@@ -125,7 +208,7 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={pending}
+              disabled={pending || emailCheckStatus === "checking" || emailCheckStatus === "taken"}
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {pending ? "가입 중..." : "가입하기"}
