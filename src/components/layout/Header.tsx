@@ -32,7 +32,7 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2 group">
           <Sparkles className="h-6 w-6 text-accent" />
           <span className="font-serif text-xl font-bold tracking-tight">
-            HGFAI
+            FALAB
           </span>
         </Link>
 

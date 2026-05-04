@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!app) return { title: "앱을 찾을 수 없습니다" };
 
     return {
-      title: `${app.title} | Hitchhiker's Guide`,
+      title: `${app.title} | FALAB`,
       description: app.description,
       openGraph: {
         title: app.title,
@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     };
   } catch {
-    return { title: "Hitchhiker's Guide to Fashion AI" };
+    return { title: "FALAB" };
   }
 }
 

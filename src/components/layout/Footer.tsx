@@ -10,10 +10,10 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="h-5 w-5 text-accent" />
-              <span className="font-serif text-lg font-bold">HGFAI</span>
+              <span className="font-serif text-lg font-bold">FALAB</span>
             </div>
             <p className="text-sm text-muted leading-relaxed">
-              Hitchhiker&apos;s Guide to Fashion AI
+              AI 리터러시 연구소
               <br />
               패션과 AI의 교차점에서 새로운 가치를 창조합니다.
             </p>
@@ -111,7 +111,7 @@ export function Footer() {
           {/* Copyright */}
           <div className="flex items-end">
             <p className="text-xs text-muted">
-              © 2026 AI Literacy Lab.
+              © 2026 AI 리터러시 연구소.
               <br />
               All rights reserved.
             </p>

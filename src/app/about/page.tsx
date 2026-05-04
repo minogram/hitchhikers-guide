@@ -10,7 +10,7 @@ export default function AboutPage() {
           About
         </p>
         <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl mb-6">
-          AI Literacy Lab
+          AI 리터러시 연구소
         </h1>
         <p className="text-lg text-muted max-w-2xl mx-auto leading-relaxed">
           패션 산업의 미래를 이끌 AI 리터러시를 연구하고 교육합니다.
@@ -25,7 +25,7 @@ export default function AboutPage() {
             <h2 className="font-serif text-2xl font-bold">미션</h2>
           </div>
           <p className="text-muted leading-relaxed text-lg">
-            AI Literacy Lab은 패션 산업 종사자와 학생들이 AI 기술을 올바르게 이해하고
+            AI 리터러시 연구소는 패션 산업 종사자와 학생들이 AI 기술을 올바르게 이해하고
             실무에 활용할 수 있도록 돕는 연구·교육 프로젝트입니다.
             빠르게 변화하는 AI 기술 환경 속에서 패션 전문가들이 새로운 도구를
             탐색하고, 창의적으로 적용하며, 산업의 혁신을 주도할 수 있는
@@ -54,7 +54,7 @@ export default function AboutPage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-serif text-2xl font-bold mb-1">PhD Shin Yong Nam · 신용남</h3>
-                <p className="text-accent font-medium mb-4">교수 · AI Literacy Lab 디렉터</p>
+                <p className="text-accent font-medium mb-4">교수 · AI 리터러시 연구소 디렉터</p>
                 <p className="text-muted leading-relaxed mb-4">
                   패션 테크놀로지와 AI 응용 분야를 연구하며, 패션 산업에서의
                   인공지능 활용 가능성을 탐구하고 있습니다.
@@ -88,7 +88,7 @@ export default function AboutPage() {
           <h2 className="font-serif text-2xl font-bold">강의 내용</h2>
         </div>
         <p className="text-muted leading-relaxed mb-10 max-w-3xl">
-          AI Literacy Lab의 커리큘럼은 이론과 실습을 균형 있게 구성하여,
+          AI 리터러시 연구소의 커리큘럼은 이론과 실습을 균형 있게 구성하여,
           수강생이 AI 도구를 직접 활용해볼 수 있는 실전 중심 교육을 제공합니다.
         </p>
 
@@ -155,7 +155,7 @@ export default function AboutPage() {
           함께 만들어가는 패션 AI의 미래
         </h2>
         <p className="text-muted max-w-lg mx-auto mb-8">
-          AI Literacy Lab과 함께 패션 산업의 새로운 가능성을 탐색하세요.
+          AI 리터러시 연구소와 함께 패션 산업의 새로운 가능성을 탐색하세요.
           커뮤니티에서 전문가들과 소통하고 최신 AI 도구를 경험해보세요.
         </p>
         <div className="flex items-center justify-center gap-4">

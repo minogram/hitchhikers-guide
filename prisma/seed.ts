@@ -55,7 +55,7 @@ async function main() {
   const posts = [
     {
       type: "notice",
-      title: "Hitchhiker's Guide to Fashion AI에 오신 것을 환영합니다!",
+      title: "FALAB에 오신 것을 환영합니다!",
       content: "패션과 AI의 교차점에서 새로운 가치를 만들어가는 커뮤니티에 오신 것을 환영합니다. 다양한 AI 도구를 탐색하고, 전문가들과 의견을 나누어 보세요.",
       isPinned: true,
       authorId: admin.id,

@@ -266,7 +266,7 @@ function CatalogContent() {
                 alt={app.title}
                 width={400}
                 height={300}
-                loading={index === 0 ? "eager" : undefined}
+                priority={index === 0}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
