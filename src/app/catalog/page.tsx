@@ -440,7 +440,7 @@ function FilterDialog({
           </div>
         </div>
 
-        <div className="mt-6 flex-1 overflow-y-auto pr-1">
+        <div className="catalog-filter-scrollbar mt-6 flex-1 overflow-y-auto pr-1">
           <div className="space-y-6">
             <FilterSection
               title="Industry"
